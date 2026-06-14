@@ -7,6 +7,7 @@
   height:100vh;
   min-height:600px;
   width:100%;
+  z-index:1;
 
 }
 
@@ -26,7 +27,6 @@
             var(--secondary-color),
             transparent
         );
-
     filter: blur(8px);
 }
 
@@ -46,7 +46,6 @@
             var(--secondary-color),
             transparent
         );
-
     filter: blur(8px);
 }
 
@@ -59,4 +58,87 @@
   flex-direction:row;
   justify-content:space-evenly;
   align-items:center;
+}
+
+.portfolio-element{
+    width:250px;
+    height:250px;
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+    background-color:var(--layer0);
+    border-width:0px;
+    border-radius:15px;
+    filter:
+        drop-shadow(0 0 5px var(--secondary-color))
+        drop-shadow(0 0 15px var(--secondary-color))
+    ;
+    transition: hover, 0.2s;
+}
+
+.portfolio-element-icon{
+    width:200px;
+    height:200px;
+}
+.portfolio-element:hover{
+    width:275px;
+    height:275px;
+    filter:
+        drop-shadow(0 0 5px var(--main-color))
+        drop-shadow(0 0 15px var(--main-color))
+}
+
+#portfolio-content-activated{
+  position:relative;
+  width:100%;
+  height:95vh;
+  min-height:570px;
+  display:flex;
+  flex-direction:row;
+  justify-content:start;
+  align-items:center;
+}
+#portfolio-navigation{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+    align-items:center;
+    height:100%;    
+    width:150px;
+}
+.portfolio-element-activated{
+    width:100px;
+    height:125px;
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+    background-color:var(--layer0);
+    border-width:0px;
+    border-radius:15px;
+    filter:
+        drop-shadow(0 0 5px var(--secondary-color))
+        drop-shadow(0 0 15px var(--secondary-color))
+    ;
+    transition: hover, 0.2s;
+}
+
+.portfolio-element-icon-activated{
+    width:80px;
+    height:80px;
+}
+.portfolio-element-clicked{
+    width:100px;
+    height:125px;
+    filter:
+        drop-shadow(0 0 5px var(--main-color))
+        drop-shadow(0 0 15px var(--main-color))
+    ;
+}
+#portfolio-active-content{
+    width:95%;
+    height:95%;
+    background-color:#141414;
+    border-radius: 25px;
 }

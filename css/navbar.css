@@ -40,11 +40,19 @@
   background-color:var(--layer0);
   height:30px;
   border-width:0px;
-  border-style:solid;
   border-radius:15px;
   filter:
      drop-shadow(0 0 5px var(--secondary-color))
      drop-shadow(0 0 15px var(--secondary-color))
+    ;
+  transition: hover, 0.2s;
+}
+.navlink:hover{
+  width:175px;
+  filter:
+    drop-shadow(0 0 5px var(--main-color))
+    drop-shadow(0 0 15px var(--main-color))
+    ;
 }
 .navlink-icon{
   width:24px;
@@ -57,9 +65,6 @@
   flex-direction:row;
   justify-content:center;
   align-items:center;
-}
-button{
-
 }
 
 .hidden-navbar{
