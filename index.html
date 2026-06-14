@@ -3,7 +3,7 @@
 <head>
   <!--Visual data-->
   <title>ParvizaN24 | Portfolio of Parviz</title>
-  <link rel="icon" href="icons/V1.4.ico" type="image/x-icon">
+  <link rel="icon" href="logos/V1.4.ico" type="image/x-icon">
 
   <!--Meta data-->
     <meta charset="UTF-8">
@@ -18,7 +18,7 @@
   <!--Open Graph data-->
     <meta property="og:title" content="ParvizaN24 | Portfolio of Parviz">
     <meta property="og:description" content="ParvizaN24 is a portfolio website showcasing the work and projects of Parviz, a web developer and designer." > 
-    <meta property="og:image" content="icons/V1.4_with_bgc.png">
+    <meta property="og:image" content="logos/V1.4_with_bgc.png">
     <meta property="og:url" content="https://parvizan24.com">
     <meta property="og:type" content="website">
 
@@ -35,6 +35,8 @@
   <!--JS files-->
     <script type="module" src="js/parvizan24.js"></script>
     <script type="module" src="js/navbar.js"></script>
+    <!--sparkles-->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.11.1/tsparticles.slim.bundle.min.js"></script>
 
   <!--Fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,25 +46,34 @@
 </head>
 <body>
   <div id="navbar">
-    <div class="logo">ParvizaN</div>
-    <div class="nav-link">
-      <button>
-        <a href="#hero"><h3>About me</h3></a>
-      </button>
-      <button>
-        <a href="#portfolio"><h3>Portfolio</h3></a>
-      </button>
-      <button>
-        <a href="#story"><h3>My Story</h3></a>
-      </button>
+    <div class="logo">
+      <a href="#hero">
+        <img class="PN" src="logos/parvizan_yellow.svg" alt="ParvizaN">
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="#hero" class="navlink">
+        <img class="navlink-icon" src="icons/Emoji Happy.png" alt="Emoji Happy">
+        <h3>About me</h3>
+      </a>
+      <a href="#portfolio" class="navlink">
+        <img class="navlink-icon" src="icons/Send.png" alt="Emoji Happy">
+        <h3>Portfolio</h3>
+        <img class="navlink-icon" src="icons/Send.png" alt="Emoji Happy">
+      </a>
+      <a href="#story" class="navlink">
+        <h3>My Story</h3>
+        <img class="navlink-icon" src="icons/Book.png" alt="Emoji Happy">
+      </a>
     </div>
     <div class="contacts-button">
         <a href="#contacts">
-          <h3>Contacts</h3>
+          <img class="PN" src="logos/Contacts.png" alt="ParvizaN">
         </a>
     </div>
   </div>
   <div id="hero">
+    <div id="tsparticles"></div>
     <div id="hero-content">
       <h1>Hi there. My name is Parviz. </h1>
       <h2>I am a Developer. I design, build and launch digital products.</h2>
@@ -72,6 +83,11 @@
     <div id="hero-photo">
       Yoooo, I am looking for some cool photo to put here, if you have one, please send it to me :D
     </div>
+  <div id="arrow-to-down">
+      <a href="#portfolio">
+        <img src="icons/arrow_down.png" alt="Arrow Down">
+      </a>
+  </div>
   </div>
   <div id="portfolio">
     <div id="portfolio-content">
@@ -81,10 +97,45 @@
     </div>
   </div>
   <div id="contacts">
+
   </div>
   <div id="story">
 
   </div>
-  <div id="footer"></div>    
+  <div id="footer">
+
+  </div> 
+  
+  <!-- sparkles script -->
+  <script>
+    tsParticles.load("tsparticles", {
+      background: { color: { value: "transparent" } },
+      fullScreen: { enable: false, zIndex: 0 },
+      detectRetina: true,
+      fpsLimit: 120,
+      interactivity: {
+        events: {
+          onClick: { enable: true, mode: "push" },
+          onHover: { enable: false },
+          resize: true,
+        },
+        modes: { push: { quantity: 4 } },
+      },
+      particles: {
+        color: { value: "#ffffff" },
+        move: { 
+          direction: "none", 
+          enable: true, 
+          outModes: { default: "out" }, 
+          speed: 1,
+          random: true,
+        },
+        number: { density: { enable: true, width: 400, height: 400 }, value: 60 },
+        opacity: { value: 0.5 },
+        shape: { type: "circle" },
+        size: { value: { min: 0.3, max: 1.05 } },
+      },
+    });
+  </script>
 </body>
 </html>

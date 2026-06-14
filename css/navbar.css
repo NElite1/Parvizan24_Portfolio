@@ -7,9 +7,10 @@
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  background-color:rgba(0,0,0,0.8);
-  backdrop-filter:blur(5px);
+  background-color:rgba(0,0,0,0.9);
+  backdrop-filter:blur(3px);
   -webkit-backdrop-filter:blur(5px); 
+  z-index:100;
 }
 .logo{
   flex:0.75;
@@ -17,13 +18,38 @@
   flex-direction:row;
   justify-content:center;
   align-items:center;
+  z-index:10;
 }
-.nav-link{
+.PN{
+  height:30px;
+}
+.nav-links{
   flex:3;
   display:flex;
   flex-direction:row;
   justify-content:space-evenly;
   align-items:center;
+  
+}
+.navlink{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  width:150px;
+  background-color:var(--layer0);
+  height:30px;
+  border-width:0px;
+  border-style:solid;
+  border-radius:15px;
+  filter:
+     drop-shadow(0 0 5px var(--secondary-color))
+     drop-shadow(0 0 15px var(--secondary-color))
+}
+.navlink-icon{
+  width:24px;
+  height:24px;
+  transform: translateY(1px);
 }
 .contacts-button{
   flex:1;
@@ -33,15 +59,7 @@
   align-items:center;
 }
 button{
-  background-color:var(--layer0);
-  width:100px;
-  height:30px;
-  border-width:3px;
-  border-style:solid;
-  border-radius:15px;
-  filter:
-     drop-shadow(0 0 5px var(--secondary-color))
-     drop-shadow(0 0 15px var(--secondary-color))
+
 }
 
 .hidden-navbar{
@@ -51,5 +69,5 @@ button{
 
 .shown-navbar{
   transform:translateY(0);
-  transition:transform o.3 ease-in-out;
+  transition:transform 0.3s ease-in-out;
 }
