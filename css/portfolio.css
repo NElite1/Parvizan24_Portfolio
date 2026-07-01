@@ -47,7 +47,7 @@
     filter: blur(8px);
 }
 
-#portfolio-section-logo{
+#portfolio-websection-logo{
   position:absolute;
   top:50px;
   left:50%;
@@ -79,7 +79,7 @@
   align-items:center;
 }
 
-.portfolio-element{
+.portfolio-section{
     width:250px;
     height:250px;
     display:flex;
@@ -95,11 +95,11 @@
     ;
     transition: hover, 0.2s;
 }
-.portfolio-element-icon{
+.portfolio-section-icon{
     width:200px;
     height:200px;
 }
-.portfolio-element:hover{
+.portfolio-section:hover{
     width:275px;
     height:275px;
     filter:
@@ -132,7 +132,7 @@
     width:150px;
     margin:0 25px 0 25px;
 
-    background:#252525;
+    background:#141414;
 
     border-radius:25px;
     border:1px solid rgba(255,255,255,.05);
@@ -154,27 +154,38 @@
         transform .25s ease,
         box-shadow .25s ease;
 }
-
-#portfolio-section-logo-activated{
+#portfolio-websection-logo-activated{
     position:absolute;
-    top:12px;
+    top:20px;
     left:50%;
     transform:translateX(-50%);
     display:flex;
     flex-direction:row;
     justify-content:center;
     align-items:center;
+    background-color:#252525;
     width:120px;
-    background-color:var(--layer0);
-    height:34px;
+    height:50px;
     border-width:0px;
-    border-radius:18px;
+    border-radius:25px;
     box-sizing:border-box;
-    padding:6px 10px;
-    filter: drop-shadow(0 0 5px var(--secondary-color)) drop-shadow(0 0 15px var(--secondary-color));
+    border:1px solid rgba(255,255,255,.05);
+
+    box-shadow:
+        /* Main shadow */
+        0 10px 30px rgba(0,0,0,.45),
+
+        /* Soft shadow close to element */
+        0 4px 10px rgba(0,0,0,.35),
+
+        /* Top highlight */
+        inset 0 1px 0 rgba(255,255,255,.08),
+
+        /* Bottom dark edge */
+        inset 0 -1px 0 rgba(0,0,0,.45);
 }
-.portfolio-element-activated{
-    width:100px;
+.portfolio-section-activated{
+    width:115px;
     height:125px;
     display:flex;
     flex-direction:column;
@@ -189,18 +200,19 @@
     ;
     transition: hover, 0.2s;
 }
-.portfolio-element-icon-activated{
+.portfolio-section-icon-activated{
     width:80px;
     height:80px;
 }
-.portfolio-element-clicked{
-    width:100px;
+.portfolio-section-clicked{
+    width:125px;
     height:125px;
     filter:
         drop-shadow(0 0 5px var(--main-color))
         drop-shadow(0 0 15px var(--main-color))
     ;
 }
+
 #portfolio-active-content{
     flex: 0.98;
     height:100%;

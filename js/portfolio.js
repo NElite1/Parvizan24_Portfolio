@@ -1,26 +1,28 @@
 const portfolioContent = document.getElementById("portfolio-content");
-const portfolioLogo = document.getElementById('portfolio-section-logo');
+const portfolioLogo = document.getElementById('portfolio-websection-logo');
 
 function renderPortfolio(active) {
     portfolioLogo.remove();
     portfolioContent.innerHTML = `
         <div id="portfolio-content-activated">
             <div id="portfolio-navigation-activated">
-                <div id="portfolio-section-logo-activated">
+
+                <div id="portfolio-websection-logo-activated">
                   <h3>Portfolio</h3>
                 </div>
-                <div class="portfolio-element-activated ${active === "myWorks" ? "portfolio-element-clicked" : ""}" id="myWorks">
-                    <img src="icons/Cube.png" alt="My Works" class="portfolio-element-icon-activated">
+
+                <div class="portfolio-section-activated ${active === "myWorks" ? "portfolio-section-clicked" : ""}" id="myWorks">
+                    <img src="icons/Cube.png" alt="My Works" class="portfolio-section-icon-activated">
                     <h3>My Works</h3>
                 </div>
 
-                <div class="portfolio-element-activated ${active === "projects" ? "portfolio-element-clicked" : ""}" id="projects">
-                    <img src="icons/cube_focus.png" alt="Projects" class="portfolio-element-icon-activated">
+                <div class="portfolio-section-activated ${active === "projects" ? "portfolio-section-clicked" : ""}" id="projects">
+                    <img src="icons/cube_focus.png" alt="Projects" class="portfolio-section-icon-activated">
                     <h3>Projects</h3>
                 </div>
 
-                <div class="portfolio-element-activated ${active === "skills" ? "portfolio-element-clicked" : ""}" id="skills">
-                    <img src="icons/address_book.png" alt="Skills" class="portfolio-element-icon-activated">
+                <div class="portfolio-section-activated ${active === "skills" ? "portfolio-section-clicked" : ""}" id="skills">
+                    <img src="icons/address_book.png" alt="Skills" class="portfolio-section-icon-activated">
                     <h3>Skills</h3>
                 </div>
 
