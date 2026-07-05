@@ -3,7 +3,7 @@
 <head>
   <!--Visual data-->
   <title>ParvizaN24 | Portfolio of Parviz</title>
-  <link rel="icon" href="logos/V1.4.ico" type="image/x-icon">
+  <link rel="icon" href="../logos/V1.4.ico" type="image/x-icon">
 
   <!--Meta data-->
     <meta charset="UTF-8">
@@ -18,7 +18,7 @@
   <!--Open Graph data-->
     <meta property="og:title" content="ParvizaN24 | Portfolio of Parviz">
     <meta property="og:description" content="ParvizaN24 is a portfolio website showcasing the work and projects of Parviz, a web developer and designer." > 
-    <meta property="og:image" content="logos/V1.4_with_bgc.png">
+    <meta property="og:image" content="../logos/V1.4_with_bgc.png">
     <meta property="og:url" content="https://parvizan24.com">
     <meta property="og:type" content="website">
 
@@ -30,7 +30,6 @@
     <link rel="stylesheet" href="css/contacts.css">
     <link rel="stylesheet" href="css/story.css">
     <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/my_projects.css">
     <link rel="stylesheet" href="css/portfolio/my_works.css">
     <link rel="stylesheet" href="css/portfolio/my_projects.css">
     <link rel="stylesheet" href="css/portfolio/skills.css">
@@ -40,6 +39,7 @@
     <script type="module" src="js/parvizan24.js"></script>
     <script type="module" src="js/navbar.js"></script>
     <script type="module" src="js/portfolio.js"></script>
+    <script type="module" src="js/portfolio/my_works.js"></script>
     <!--sparkles-->
     <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.11.1/tsparticles.slim.bundle.min.js"></script>
 
@@ -59,17 +59,17 @@
           </div>
 
           <div class="portfolio-section-activated portfolio-section-clicked" id="myWorks">
-              <img src="icons/Cube.png" alt="My Works" class="portfolio-section-icon-activated">
+              <img src="../icons/Cube.png" alt="My Works" class="portfolio-section-icon-activated">
               <h3>My Works</h3>
           </div>
 
           <div class="portfolio-section-activated"  id="projects">
-              <img src="icons/cube_focus.png" alt="Projects" class="portfolio-section-icon-activated">
+              <img src="../icons/cube_focus.png" alt="Projects" class="portfolio-section-icon-activated">
               <h3>Projects</h3>
           </div>
 
           <div class="portfolio-section-activated"  id="skills">
-              <img src="icons/address_book.png" alt="Skills" class="portfolio-section-icon-activated">
+              <img src="../icons/address_book.png" alt="Skills" class="portfolio-section-icon-activated">
               <h3>Skills</h3>
           </div>
 
@@ -78,15 +78,23 @@
 
       <div id="portfolio-active-content">
           <div id="portfolio-active-content-navbar">
-            <h3 class="works_section">Design</h3>
+            <div id="slider"></div>
+            <h3 class="works_section active">Design</h3>
             <h3 class="works_section">Programming</h3>
             <h3 class="works_section">Engineering</h3>
             <h3 class="works_section">Good Person :)</h3>
+            <div class="style-selector">
+              <button id="line-style-selector" class="active">
+                <img src="../icons/Menu.png">
+              </button>
+              <button id="grid-style-selector">
+                <img src="../icons/Grid.png">
+              </button>
+            </div>
+
           </div>
+          <div class="my-work"></div>
       </div>
-
-
-
     </div>
     </div>
   </div>

@@ -1,0 +1,16 @@
+#contacts{
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  min-height:600px;
+  width:100%;
+
+  background: linear-gradient(
+    to top,
+    var(--layer0) 0%,
+    var(--main-color) 5%,
+    var(--layer0) 100%);
+}

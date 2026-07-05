@@ -1,11 +1,20 @@
 :root{
   --layer0: #000000;
+  --layer1: #141414;
+  --layer2: #252525;
   --main-color: #004225;
   --secondary-color: #4A067D;
   --text: #ffffff;
 }
 html {
   scroll-behavior: smooth;
+}
+*{
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+*::-webkit-scrollbar{
+  display:none;
 }
 body{
   background-color:var(--layer0);
