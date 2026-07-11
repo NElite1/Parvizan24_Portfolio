@@ -32,6 +32,71 @@ function buildPanel(entries, extraClass, buildItem) {
     return panel;
 }
 
+// Detail overlay, same pattern as the Skills section: an in-page panel that
+// covers the list and shows the clicked work in full; ✕ closes it.
+function openWorkDetail(entry) {
+    closeWorkDetail();
+
+    const overlay = document.createElement("div");
+    overlay.className = "work-detail-overlay";
+
+    const close = document.createElement("button");
+    close.className = "work-detail-close";
+    close.textContent = "✕";
+    close.addEventListener("click", closeWorkDetail);
+
+    const name = document.createElement("h2");
+    name.className = "work-detail-name";
+    name.textContent = entry.name ?? "";
+
+    overlay.appendChild(close);
+    overlay.appendChild(name);
+
+    // The image field is placeholder text for now; once it holds a real path
+    // (contains "/" or "."), it renders as an actual image instead.
+    if (entry.image) {
+        if (/[./]/.test(entry.image)) {
+            const img = document.createElement("img");
+            img.className = "work-detail-photo";
+            img.src = entry.image;
+            img.alt = entry.name ?? "";
+            overlay.appendChild(img);
+        } else {
+            const box = document.createElement("div");
+            box.className = "work-detail-image-box";
+            box.textContent = entry.image;
+            overlay.appendChild(box);
+        }
+    }
+
+    if (entry.description) {
+        const desc = document.createElement("div");
+        desc.className = "work-detail-description";
+        desc.textContent = entry.description;
+        overlay.appendChild(desc);
+    }
+
+    if (entry.customerReview) {
+        const review = document.createElement("blockquote");
+        review.className = "work-detail-review";
+        review.textContent = entry.customerReview;
+        overlay.appendChild(review);
+    }
+
+    if (entry.skill) {
+        const skill = document.createElement("span");
+        skill.className = "work-detail-skill";
+        skill.textContent = entry.skill;
+        overlay.appendChild(skill);
+    }
+
+    myWorkContainer.appendChild(overlay);
+}
+
+function closeWorkDetail() {
+    myWorkContainer?.querySelector(".work-detail-overlay")?.remove();
+}
+
 function buildLinePanel(entries) {
     return buildPanel(entries, null, (entry, index) => {
         const line = document.createElement("div");
@@ -45,6 +110,7 @@ function buildLinePanel(entries) {
             line.appendChild(el);
         });
 
+        line.addEventListener("click", () => openWorkDetail(entry));
         return line;
     });
 }
@@ -73,6 +139,7 @@ function buildGridPanel(entries) {
 
         card.appendChild(image);
         card.appendChild(info);
+        card.addEventListener("click", () => openWorkDetail(entry));
         return card;
     });
 }
@@ -153,6 +220,8 @@ function animateGridEntrance(panel) {
 // plain tab navigation never triggers it, even the first time a tab is built.
 function showTab(typeLabel, direction = 0, forceEntrance = false) {
     if (!myWorkContainer) return;
+
+    closeWorkDetail();
 
     const type = typeLabel.trim().toLowerCase();
     const key = `${currentStyle}:${type}`;

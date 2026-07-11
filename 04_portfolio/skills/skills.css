@@ -119,8 +119,8 @@
     text-transform:capitalize;
 }
 .skill-detail-short{
-    color:var(--main-color);
-    font-weight:500;
+    color:white;
+    font-weight:700;
 }
 .skill-detail-long{
     box-sizing:border-box;

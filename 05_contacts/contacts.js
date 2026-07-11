@@ -115,6 +115,195 @@ function metaRow(label, value) {
     return row;
 }
 
+// How far past the first-viewport edge the below-the-fold list starts, so its
+// neon glow (box-shadow) doesn't bleed into the first view either.
+const FOLD_GLOW_PAD = 24;
+
+// Splits the rendered cards at the viewport fold. Walking the cards in order,
+// while card height + gap + the section's own top/bottom paddings still fit
+// inside 100vh, the card belongs to the first (immediately visible) list.
+// Every remaining card is already in the DOM (prerendered - images load, layout
+// is ready) but gets pushed below the first viewport, so with the section
+// opened at 100% the user doesn't see it until they continue scrolling.
+// The push is one margin-top on the first overflow card: the cards stay direct
+// children of #contacts-cards, keeping the nth-child chessboard intact.
+function layoutFold() {
+    const section = document.getElementById("contacts");
+    const container = document.getElementById("contacts-cards");
+    if (!section || !container) return;
+
+    const cards = [...container.children];
+    if (cards.length === 0) return;
+
+    // Clear a previous fold before re-measuring (e.g. on resize).
+    cards.forEach(card => { card.style.marginTop = ""; });
+
+    const sectionStyle = getComputedStyle(section);
+    const padTop = parseFloat(sectionStyle.paddingTop) || 0;
+    const padBottom = parseFloat(sectionStyle.paddingBottom) || 0;
+    const gap = parseFloat(getComputedStyle(container).rowGap) || 0;
+
+    // Vertical space the first list may occupy inside one viewport.
+    const budget = window.innerHeight - padTop - padBottom;
+
+    let used = 0;
+    let foldIndex = -1;
+    for (let i = 0; i < cards.length; i++) {
+        const next = used + (i > 0 ? gap : 0) + cards[i].offsetHeight;
+        if (next > budget) {
+            foldIndex = i;
+            break;
+        }
+        used = next;
+    }
+
+    // Everything fits (-1), or not even the first card does (0) - no fold.
+    if (foldIndex <= 0) return;
+
+    // The leftover viewport space (the room the first overflow card "gave up")
+    // is split into equal parts and added to every gap between the visible
+    // cards, so the first view is filled edge-to-padding instead of leaving a
+    // dead band above the fold. Works for any visible count; with a single
+    // visible card there are no gaps to grow, so it just stays at the top.
+    const visibleCount = foldIndex;
+    const leftover = budget - used;
+    let spread = 0;
+    if (visibleCount > 1 && leftover > 0) {
+        spread = leftover / (visibleCount - 1);
+        for (let i = 1; i < visibleCount; i++) {
+            cards[i].style.marginTop = `${spread}px`;
+        }
+    }
+
+    // Where the overflow card would naturally sit (including the widened gaps)
+    // vs. where the fold is, both measured from the section's top edge.
+    const naturalTop = padTop + used + spread * (visibleCount - 1) + gap;
+    const foldTop = window.innerHeight + FOLD_GLOW_PAD;
+    const push = foldTop - naturalTop;
+    if (push > 0) cards[foldIndex].style.marginTop = `${push}px`;
+}
+
+// Cursor glow-snake: a chain of soft purple blobs. While the cursor moves,
+// each blob eases toward the one ahead of it, so the chain stretches into a
+// snake slithering after the mouse. When the cursor rests, the blobs' targets
+// switch to rotating orbit slots around it, and the snake coils up into a
+// slowly swirling cyclone. Transform-only updates on the compositor, and the
+// rAF loop stops when the cursor leaves.
+function initSpotlight() {
+    const section = document.getElementById("contacts");
+    if (!section || window.matchMedia("(pointer: coarse)").matches) return;
+
+    const SEGMENTS = 8;
+    const IDLE_AFTER_MS = 350; // rest this long -> snake coils into the cyclone
+
+    const segs = [];
+    for (let i = 0; i < SEGMENTS; i++) {
+        const el = document.createElement("div");
+        el.className = "contacts-glow-seg";
+
+        // Head is the biggest and brightest; the tail thins out.
+        const size = 300 - i * 24;
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+
+        section.appendChild(el);
+        segs.push({ el, x: 0, y: 0, fade: 1 - (i / SEGMENTS) * 0.65 });
+    }
+
+    let targetX = 0;
+    let targetY = 0;
+    let inside = false;
+    let raf = 0;
+    let lastMove = 0;
+    let lastTs = 0;
+    let rot = 0;
+    let idleStart = 0;
+
+    const SWIRL_RAMP_MS = 1600; // how long the cyclone takes to fully bloom
+
+    const step = () => {
+        // One clock for everything (mixing the rAF timestamp with
+        // performance.now() risks subtle divergence).
+        const now = performance.now();
+        const dt = Math.min((now - lastTs) / 1000 || 0, 0.05);
+        lastTs = now;
+
+        const idle = inside && now - lastMove > IDLE_AFTER_MS;
+        if (idle && !idleStart) idleStart = now;
+        if (!idle) idleStart = 0;
+
+        // The cyclone blooms out of the standing glow: orbit radius and spin
+        // both start at zero and ease up (smoothstep) over the ramp, so the
+        // swirl emerges gently instead of snapping into a circle.
+        let swirl = 0;
+        if (idle) {
+            const p = Math.min((now - idleStart) / SWIRL_RAMP_MS, 1);
+            swirl = p * p * (3 - 2 * p);
+            rot += dt * 1.4 * swirl; // spin ramps with the bloom (inner bands run ~1.35x this)
+        }
+
+        segs.forEach((seg, i) => {
+            let gx;
+            let gy;
+
+            if (idle) {
+                // Cyclone, hurricane-style: blobs sit along a spiral arm (each
+                // one further out AND further around), the inner bands rotate
+                // faster than the outer ones (the shear that winds the arm),
+                // and the innermost blob keeps a small clear "eye" open at the
+                // very center. Radius still breathes so the vortex feels alive.
+                const angle = rot * (1.35 - i * 0.09) + i * 1.15;
+                const radius = swirl * (26 + i * 12) * (1 + 0.12 * Math.sin(now / 700 + i));
+                gx = targetX + Math.cos(angle) * radius;
+                gy = targetY + Math.sin(angle) * radius;
+            } else {
+                // Snake: the head chases the cursor, every other blob chases
+                // the blob ahead of it.
+                gx = i === 0 ? targetX : segs[i - 1].x;
+                gy = i === 0 ? targetY : segs[i - 1].y;
+            }
+
+            // Slightly lazy follow, so the snake stays visible and enjoyable
+            // even at normal cursor speeds.
+            const ease = i === 0 ? 0.16 : 0.22;
+            seg.x += (gx - seg.x) * ease;
+            seg.y += (gy - seg.y) * ease;
+            seg.el.style.transform = `translate(${seg.x}px, ${seg.y}px) translate(-50%, -50%)`;
+        });
+
+        if (inside) raf = requestAnimationFrame(step);
+        else raf = 0;
+    };
+
+    section.addEventListener("mousemove", e => {
+        const rect = section.getBoundingClientRect();
+        targetX = e.clientX - rect.left;
+        targetY = e.clientY - rect.top;
+        lastMove = performance.now();
+
+        if (!inside) {
+            inside = true;
+            // First entry: materialize at the cursor instead of flying in.
+            segs.forEach(seg => {
+                seg.x = targetX;
+                seg.y = targetY;
+                seg.el.style.opacity = seg.fade;
+            });
+        }
+        if (!raf) {
+            lastTs = 0;
+            raf = requestAnimationFrame(step);
+        }
+    });
+
+    section.addEventListener("mouseleave", () => {
+        inside = false;
+        segs.forEach(seg => { seg.el.style.opacity = 0; });
+    });
+}
+
+let foldResizeTimer = 0;
+
 async function initContacts() {
     const container = document.getElementById("contacts-cards");
     if (!container) return;
@@ -123,6 +312,16 @@ async function initContacts() {
     contactsData = await response.json();
 
     container.replaceChildren(...Object.values(contactsData).map(buildCard));
+    layoutFold();
+
+    // Re-split when the viewport changes, and once more after everything
+    // (fonts, images) has loaded in case card heights settled.
+    window.addEventListener("resize", () => {
+        clearTimeout(foldResizeTimer);
+        foldResizeTimer = setTimeout(layoutFold, 150);
+    });
+    window.addEventListener("load", layoutFold);
 }
 
 initContacts();
+initSpotlight();

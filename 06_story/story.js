@@ -11,24 +11,16 @@ const BOOKMARK_MIN = 200; // ignore trivial scroll positions when offering resum
 
 let bookEl = null;
 let scrollerEl = null;
-let chipsEl = null;
 let progressEl = null;
-let yearEl = null;
+let periodEl = null;
 let coverEl = null;
 let lightboxEl = null;
 
-let sections = [];      // { el, chip, startYear }
+let sections = [];      // { el, period }
 let activeIndex = -1;
-let displayedYear = null;
-let yearRAF = 0;
 let lastSave = 0;
 
 /* ------------------------------------------------------------------ parsing */
-
-function parseStartYear(period) {
-    const match = /\d{4}/.exec(period ?? "");
-    return match ? Number(match[0]) : null;
-}
 
 // Turn a section's content list into resolved blocks, dropping markers whose
 // photo/quote key doesn't exist.
@@ -134,26 +126,21 @@ function renderChess(container, blocks) {
     }
 }
 
-function renderSection(section, index, total) {
+function renderSection(section) {
     const el = document.createElement("section");
     el.className = "story-section";
 
+    // Sticky within its own section: the header pins to the top of the book
+    // while its section is being read, then gets pushed up and replaced by the
+    // next section's header (CSS position:sticky confined to the parent).
     const header = document.createElement("div");
-    header.className = "story-section-header story-reveal";
-
-    const chapter = document.createElement("span");
-    chapter.className = "story-chapter";
-    chapter.textContent = `Chapter ${index + 1} of ${total}`;
+    header.className = "story-section-header";
 
     const topic = document.createElement("h2");
     topic.className = "story-topic";
     topic.textContent = section.topic ?? "";
 
-    const period = document.createElement("span");
-    period.className = "story-period";
-    period.textContent = section.period ?? "";
-
-    header.append(chapter, topic, period);
+    header.append(topic);
     el.appendChild(header);
 
     const body = document.createElement("div");
@@ -182,9 +169,12 @@ function buildCover(cover, savedTop) {
     subtitle.className = "story-cover-subtitle";
     subtitle.textContent = cover?.subtitle ?? "";
 
+    // The button is the only way in: clicking elsewhere on the cover or
+    // scrolling over it does NOT open the book.
     const open = document.createElement("button");
     open.className = "story-cover-open";
     open.textContent = cover?.hint ?? "open the book";
+    open.addEventListener("click", () => openBook(0));
 
     coverEl.append(title, subtitle, open);
 
@@ -193,15 +183,9 @@ function buildCover(cover, savedTop) {
         const cont = document.createElement("button");
         cont.className = "story-cover-continue";
         cont.textContent = "continue where you left off";
-        cont.addEventListener("click", e => {
-            e.stopPropagation();
-            openBook(savedTop);
-        });
+        cont.addEventListener("click", () => openBook(savedTop));
         coverEl.appendChild(cont);
     }
-
-    coverEl.addEventListener("click", () => openBook(0));
-    coverEl.addEventListener("wheel", () => openBook(0), { once: true, passive: true });
 
     return coverEl;
 }
@@ -260,45 +244,15 @@ function openLightbox(src, caption) {
     lightboxEl.classList.add("open");
 }
 
-/* ------------------------------------------------- scroll: spy / year / save */
+/* ------------------------------------- scroll: progress / period / save */
 
-function setActive(index) {
+// Floating corner badge shows the period of the section currently being read.
+function setActivePeriod(index) {
     if (index === activeIndex) return;
     activeIndex = index;
 
-    sections.forEach((s, i) => s.chip.classList.toggle("active", i === index));
-
-    const target = sections[index]?.startYear;
-    if (target != null) animateYear(target);
-}
-
-// Count the floating badge up/down to the new year so time feels like passing.
-function animateYear(target) {
-    if (displayedYear === null) {
-        displayedYear = target;
-        yearEl.textContent = String(target);
-        return;
-    }
-    if (displayedYear === target) return;
-
-    cancelAnimationFrame(yearRAF);
-    const start = displayedYear;
-    const delta = target - start;
-    const duration = 600;
-    // Base elapsed time on the rAF timestamp itself so start and progress share
-    // one clock (mixing performance.now() with the rAF clock can yield p<0).
-    let t0 = null;
-
-    const step = now => {
-        if (t0 === null) t0 = now;
-        const p = Math.min(Math.max((now - t0) / duration, 0), 1);
-        const value = Math.round(start + delta * p);
-        yearEl.textContent = String(value);
-        displayedYear = value;
-        if (p < 1) yearRAF = requestAnimationFrame(step);
-        else displayedYear = target;
-    };
-    yearRAF = requestAnimationFrame(step);
+    const period = sections[index]?.period;
+    if (period) periodEl.textContent = period;
 }
 
 function saveProgress(top) {
@@ -314,13 +268,13 @@ function onScroll() {
     const max = scrollerEl.scrollHeight - scrollerEl.clientHeight;
     progressEl.style.width = `${max > 0 ? (scrollerEl.scrollTop / max) * 100 : 0}%`;
 
-    // Active section: the last one whose top has passed under the sticky chips.
-    const pos = scrollerEl.scrollTop + chipsEl.offsetHeight + 40;
+    // Active section: the last one whose top has passed the sticky-header zone.
+    const pos = scrollerEl.scrollTop + 120;
     let active = 0;
     sections.forEach((s, i) => {
         if (s.el.offsetTop <= pos) active = i;
     });
-    setActive(active);
+    setActivePeriod(active);
 
     saveProgress(scrollerEl.scrollTop);
 }
@@ -336,46 +290,27 @@ function build(data) {
         savedTop = Number(localStorage.getItem(BOOKMARK_KEY)) || 0;
     } catch { /* ignore */ }
 
-    // Progress bar + year badge float over the book, above the cover.
+    // Progress bar + floating period badge sit over the book, above the cover.
     progressEl = document.createElement("div");
     progressEl.className = "story-progress";
 
-    yearEl = document.createElement("div");
-    yearEl.className = "story-year";
+    periodEl = document.createElement("div");
+    periodEl.className = "story-period-badge";
 
-    // Scroller holds the sticky chips bar and all sections.
+    // Scroller holds the sections; each section brings its own sticky header.
     scrollerEl = document.createElement("div");
     scrollerEl.className = "story-scroll locked";
 
-    chipsEl = document.createElement("div");
-    chipsEl.className = "story-chips";
-    scrollerEl.appendChild(chipsEl);
-
-    entries.forEach((section, index) => {
-        const el = renderSection(section, index, entries.length);
+    entries.forEach(section => {
+        const el = renderSection(section);
         scrollerEl.appendChild(el);
-
-        const chip = document.createElement("button");
-        chip.className = "story-chip";
-        chip.textContent = section.period ?? `#${index + 1}`;
-        chip.title = section.topic ?? "";
-        chip.addEventListener("click", () => {
-            const top = Math.max(el.offsetTop - chipsEl.offsetHeight, 0);
-            scrollerEl.scrollTo({ top, behavior: "smooth" });
-        });
-        chipsEl.appendChild(chip);
-
-        sections.push({ el, chip, startYear: parseStartYear(section.period) });
+        sections.push({ el, period: section.period ?? "" });
     });
 
-    bookEl.append(progressEl, scrollerEl, yearEl, buildCover(cover, savedTop));
+    bookEl.append(progressEl, scrollerEl, periodEl, buildCover(cover, savedTop));
 
-    // Seed the year badge with the first chapter's year.
-    if (sections[0]?.startYear != null) {
-        displayedYear = sections[0].startYear;
-        yearEl.textContent = String(sections[0].startYear);
-    }
-    setActive(0);
+    // Seed the badge with the first chapter's period.
+    setActivePeriod(0);
 
     // Time-travel reveals: fade/slide each block in as it enters the scroller.
     const io = new IntersectionObserver(entriesObs => {

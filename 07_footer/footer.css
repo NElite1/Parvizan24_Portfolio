@@ -3,4 +3,18 @@
   width:100%;
   height:300px;
   background:linear-gradient(to top, var(--main-color), var(--layer0));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#footer-signature{
+  color:var(--text);
+  font-family:Inter, sans-serif;
+  font-size:1.25rem;
+  font-weight:500;
+  letter-spacing:0.02em;
+  line-height:1.4em;
+  text-align:center;
+  margin:0;
+  padding:0 24px;
 }

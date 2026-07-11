@@ -46,8 +46,129 @@
   transition:width .1s linear;
 }
 
-/* Floating year counter. */
-.story-year{
+/* Scroller -------------------------------------------------------------- */
+.story-scroll{
+  position:relative;
+  height:100%;
+  overflow-y:auto;
+
+  /* Scrolling the book stays in the book: never chains to the page, so the
+     reader leaves only by scrolling the page margins outside the book. */
+  overscroll-behavior:contain;
+}
+.story-scroll.locked{
+  overflow:hidden;
+}
+
+/* Sections & typography ------------------------------------------------- */
+.story-section{
+  padding:0 48px 40px;
+}
+.story-section + .story-section{
+  border-top:1px solid rgba(255,255,255,.05);
+}
+
+/* Sticky section header: pins to the top of the book while its own section
+   is being read; when the section ends, the next header pushes it up and
+   takes its place (position:sticky is confined to the parent section). */
+.story-section-header{
+  position:sticky;
+  top:0;
+  z-index:6;
+
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+
+  /* Full-bleed across the book so the pinned bar covers scrolling content
+     edge to edge (cancels the section's side padding). */
+  margin:0 -48px 26px;
+  padding:22px 48px 16px;
+
+  background:rgba(20,20,20,.85);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  backdrop-filter:blur(8px);
+
+  overflow:hidden;
+}
+/* Keep the title above the ornament layer. */
+.story-section-header > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Asanoha-star ornament (after patterns/123.jpeg): twelve-ray hemp-leaf star
+   bursts on a hexagonal lattice. The mask runs the reference's dissolve
+   horizontally - fully transparent behind the title, fully visible at the
+   right edge. */
+.story-section-header::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+
+  background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='58'><defs><g id='a'><path fill='%23ffffff' d='M5 0 L26.8 -3.3 L26.8 3.3 ZM4.3 2.5 L24.9 10.5 L21.6 16.2 ZM2.5 4.3 L16.2 21.6 L10.5 24.9 ZM0 5 L3.3 26.8 L-3.3 26.8 ZM-2.5 4.3 L-10.5 24.9 L-16.2 21.6 ZM-4.3 2.5 L-21.6 16.2 L-24.9 10.5 ZM-5 0 L-26.8 3.3 L-26.8 -3.3 ZM-4.3 -2.5 L-24.9 -10.5 L-21.6 -16.2 ZM-2.5 -4.3 L-16.2 -21.6 L-10.5 -24.9 ZM0 -5 L-3.3 -26.8 L3.3 -26.8 ZM2.5 -4.3 L10.5 -24.9 L16.2 -21.6 ZM4.3 -2.5 L21.6 -16.2 L24.9 -10.5 Z'/></g></defs><use href='%23a' x='0' y='0'/><use href='%23a' x='100' y='0'/><use href='%23a' x='0' y='58'/><use href='%23a' x='100' y='58'/><use href='%23a' x='50' y='29'/></svg>");
+  background-size:100px 58px;
+  background-repeat:repeat;
+  background-position:0 center;
+
+  opacity:.35;
+
+  /* The horizontal dissolve: transparent over the title, building steadily to
+     fully visible at the right - the reference's fade, rotated. */
+  mask-image:linear-gradient(to right, transparent 0%, transparent 20%, black 95%);
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 20%, black 95%);
+
+  animation:story-ornament-drift 110s linear infinite;
+}
+/* The lattice glides horizontally, deliberately slow (~1px/s) so repaints are
+   rare and cheap. Distance is one exact tile so the loop is seamless. */
+@keyframes story-ornament-drift{
+  from{ background-position:0 center; }
+  to{ background-position:100px center; }
+}
+/* Color accents: the same star burst in the site's two main hues - %234A067D
+   purple, and the green as %2312a35e (a lifted emerald of %23004225, which is
+   too dark to read on the bar) - sitting steadily in the lattice gaps between
+   the white stars. The drift matches the white layer's pace. */
+.story-section-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+
+  background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='58'><defs><g id='p'><path fill='%234A067D' d='M5 0 L26.8 -3.3 L26.8 3.3 ZM4.3 2.5 L24.9 10.5 L21.6 16.2 ZM2.5 4.3 L16.2 21.6 L10.5 24.9 ZM0 5 L3.3 26.8 L-3.3 26.8 ZM-2.5 4.3 L-10.5 24.9 L-16.2 21.6 ZM-4.3 2.5 L-21.6 16.2 L-24.9 10.5 ZM-5 0 L-26.8 3.3 L-26.8 -3.3 ZM-4.3 -2.5 L-24.9 -10.5 L-21.6 -16.2 ZM-2.5 -4.3 L-16.2 -21.6 L-10.5 -24.9 ZM0 -5 L-3.3 -26.8 L3.3 -26.8 ZM2.5 -4.3 L10.5 -24.9 L16.2 -21.6 ZM4.3 -2.5 L21.6 -16.2 L24.9 -10.5 Z'/></g><g id='g'><path fill='%2312a35e' d='M5 0 L26.8 -3.3 L26.8 3.3 ZM4.3 2.5 L24.9 10.5 L21.6 16.2 ZM2.5 4.3 L16.2 21.6 L10.5 24.9 ZM0 5 L3.3 26.8 L-3.3 26.8 ZM-2.5 4.3 L-10.5 24.9 L-16.2 21.6 ZM-4.3 2.5 L-21.6 16.2 L-24.9 10.5 ZM-5 0 L-26.8 3.3 L-26.8 -3.3 ZM-4.3 -2.5 L-24.9 -10.5 L-21.6 -16.2 ZM-2.5 -4.3 L-16.2 -21.6 L-10.5 -24.9 ZM0 -5 L-3.3 -26.8 L3.3 -26.8 ZM2.5 -4.3 L10.5 -24.9 L16.2 -21.6 ZM4.3 -2.5 L21.6 -16.2 L24.9 -10.5 Z'/></g></defs><use href='%23p' x='50' y='0'/><use href='%23p' x='50' y='58'/><use href='%23g' x='0' y='29'/><use href='%23g' x='100' y='29'/></svg>");
+  background-size:100px 58px;
+  background-repeat:repeat;
+  /* Same origin as the white layer, with the colored stars drawn at the gap
+     positions inside the tile: purple fills the top/bottom gaps, green the
+     side gaps - so the two colors never cover each other or the white stars. */
+  background-position:0 center;
+
+  /* Steady, no pulse - the colors are just quietly present. */
+  opacity:.3;
+
+  mask-image:linear-gradient(to right, transparent 0%, transparent 20%, black 95%);
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, transparent 20%, black 95%);
+
+  animation:story-ornament-drift 110s linear infinite;
+}
+.story-topic{
+  margin:0;
+  font-family:"Story Script", cursive;
+  font-size:clamp(34px, 5vw, 52px);
+  font-weight:400;
+  line-height:1.1;
+  color:#fff;
+  text-shadow:0 0 24px rgba(74,6,125,.5);
+}
+/* Floating period badge: bottom-right corner of the book, always showing the
+   period of the section currently under the sticky header. */
+.story-period-badge{
   position:absolute;
   right:18px;
   bottom:16px;
@@ -67,107 +188,6 @@
   color:rgba(255,255,255,.6);
 
   backdrop-filter:blur(6px);
-}
-
-/* Scroller -------------------------------------------------------------- */
-.story-scroll{
-  position:relative;
-  height:100%;
-  overflow-y:auto;
-
-  /* Scrolling the book stays in the book: never chains to the page, so the
-     reader leaves only by scrolling the page margins outside the book. */
-  overscroll-behavior:contain;
-}
-.story-scroll.locked{
-  overflow:hidden;
-}
-
-/* Sticky period chips --------------------------------------------------- */
-.story-chips{
-  position:sticky;
-  top:0;
-  z-index:6;
-
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-
-  padding:16px 40px;
-
-  background:rgba(20,20,20,.82);
-  border-bottom:1px solid rgba(255,255,255,.06);
-  backdrop-filter:blur(8px);
-}
-.story-chip{
-  padding:7px 16px;
-
-  background:var(--layer2);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:20px;
-
-  color:rgba(255,255,255,.7);
-  font-family:Inter, sans-serif;
-  font-size:14px;
-  font-weight:500;
-
-  cursor:pointer;
-  transition:color .2s ease, border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
-}
-.story-chip:hover{
-  color:#fff;
-  border-color:var(--secondary-color);
-}
-.story-chip.active{
-  color:#fff;
-  background:color-mix(in srgb, var(--secondary-color) 30%, var(--layer2));
-  border-color:var(--secondary-color);
-  box-shadow:0 0 14px -4px var(--secondary-color);
-}
-
-/* Sections & typography ------------------------------------------------- */
-.story-section{
-  padding:40px 48px;
-}
-.story-section + .story-section{
-  border-top:1px solid rgba(255,255,255,.05);
-}
-
-.story-section-header{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-bottom:26px;
-}
-.story-chapter{
-  font-family:Inter, sans-serif;
-  font-size:12px;
-  font-weight:600;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.4);
-}
-.story-topic{
-  margin:0;
-  font-family:"Story Script", cursive;
-  font-size:clamp(34px, 5vw, 52px);
-  font-weight:400;
-  line-height:1.1;
-  color:#fff;
-  text-shadow:0 0 24px rgba(74,6,125,.5);
-}
-.story-period{
-  align-self:flex-start;
-  padding:4px 14px;
-
-  background:var(--layer2);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;
-
-  font-family:Inter, sans-serif;
-  font-size:13px;
-  letter-spacing:.05em;
-  color:rgba(255,255,255,.65);
 }
 
 .story-body{
@@ -205,7 +225,13 @@
   gap:10px;
 }
 .story-figure img{
+  /* Fit any upload: shrink to the column/row width and never taller than
+     ~half the book, keeping the aspect ratio (no stretch, no crop). Tall
+     portrait photos scale down instead of filling screens. */
   max-width:100%;
+  max-height:52vh;
+  width:auto;
+  height:auto;
   border-radius:16px;
   border:1px solid rgba(255,255,255,.08);
   cursor:zoom-in;
@@ -268,7 +294,6 @@
   padding:40px;
   box-sizing:border-box;
   text-align:center;
-  cursor:pointer;
 
   background:
       radial-gradient(90% 70% at 50% 40%, rgba(74,6,125,.18), transparent 70%),

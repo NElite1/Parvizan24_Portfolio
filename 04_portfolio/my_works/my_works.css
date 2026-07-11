@@ -147,6 +147,8 @@
 
 
     background-color:#252525;
+
+    cursor:pointer;
 }
 .line.entering{
     animation:line-slide-in .4s ease both;
@@ -255,6 +257,8 @@
     border-radius:20px;
 
     background-color:#252525;
+
+    cursor:pointer;
 }
 .grid.entering{
     animation:grid-slide-in .5s ease both;
@@ -303,4 +307,105 @@
     border-radius:15px;
     padding:10px;
     box-sizing:border-box;
+}
+
+/* Work detail overlay (mirrors the Skills detail panel) ------------------- */
+.work-detail-overlay{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+    box-sizing:border-box;
+    padding:25px;
+    overflow-y:auto;
+
+    background-color:#1c1c1c;
+    border-radius:25px;
+
+    z-index:10;
+    animation:work-detail-in .3s ease both;
+}
+@keyframes work-detail-in{
+    from{ opacity:0; transform:scale(.98); }
+    to{ opacity:1; transform:scale(1); }
+}
+
+.work-detail-close{
+    position:absolute;
+    top:15px;
+    right:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:34px;
+    height:34px;
+
+    background-color:var(--layer0);
+    color:#fff;
+    border:none;
+    border-radius:50%;
+
+    font-size:16px;
+    cursor:pointer;
+    transition:background-color .2s ease;
+}
+.work-detail-close:hover{
+    background-color:var(--layer2);
+}
+
+.work-detail-name{
+    margin:0;
+    padding-right:44px;
+    font-size:26px;
+    font-weight:700;
+}
+.work-detail-photo{
+    max-width:100%;
+    max-height:45vh;
+    width:auto;
+    align-self:center;
+    border-radius:15px;
+}
+.work-detail-image-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-height:180px;
+    background-color:var(--layer0);
+    border-radius:15px;
+    color:rgba(255,255,255,.5);
+}
+.work-detail-description{
+    box-sizing:border-box;
+    background-color:var(--layer0);
+    border-radius:15px;
+    padding:25px;
+    line-height:1.6;
+    opacity:.85;
+}
+.work-detail-review{
+    margin:0;
+    padding:6px 0 6px 20px;
+    border-left:3px solid var(--main-color);
+    font-style:italic;
+    color:rgba(255,255,255,.75);
+    line-height:1.6;
+}
+.work-detail-skill{
+    align-self:flex-start;
+    padding:5px 16px;
+
+    background-color:var(--layer2);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+
+    font-size:14px;
+    color:var(--main-color);
+    font-weight:600;
 }

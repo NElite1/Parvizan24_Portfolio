@@ -1,13 +1,20 @@
 #contacts{
+  position:relative;
 
   display:flex;
   flex-direction:column;
-  justify-content:center;
+  justify-content:flex-start;
   align-items:center;
-  /* Grow with the cards (part of the normal page scroll) but never shorter than
-     a full screen, so a few cards still fill the viewport and stay centered. */
+  /* Part of the normal page scroll (no inner scroll box), so the whole page
+     scrolls in one continuous motion. At least a screen tall; grows with the
+     cards when there are more of them. Content is top-aligned with a fixed
+     padding all around, so the first card sits just below the top edge (no big
+     centered gap) and the last card always keeps the bottom padding - however
+     many cards there are, whether they fit on screen or you scroll to them. */
   min-height:100vh;
   width:100%;
+  box-sizing:border-box;
+  padding:clamp(40px, 6vh, 72px) 0;
 
   /* Gradient is pinned to one viewport height at the bottom instead of being
      stretched over the whole (now variable-height) section - keeps the green
@@ -23,8 +30,47 @@
   background-position:bottom center;
 }
 
+/* Ambient particles layer: fills the whole section behind the cards. The
+   canvas never takes pointer events (hover is detected from the window), so
+   the cards stay fully clickable. */
+#contacts-particles{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+#contacts-particles canvas{
+  pointer-events:none !important;
+}
+
+/* Cursor glow-snake segments (positioned by contacts.js): soft purple blobs
+   that chain into a snake behind the moving cursor and coil into a swirling
+   cyclone when it rests. Screen-blended so they light up the particles. */
+.contacts-glow-seg{
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:0;
+  pointer-events:none;
+
+  border-radius:50%;
+
+  background:radial-gradient(circle,
+      rgba(74, 6, 125, .38) 0%,
+      rgba(74, 6, 125, .14) 40%,
+      transparent 68%);
+  mix-blend-mode:screen;
+
+  opacity:0;
+  transition:opacity .45s ease;
+  will-change:transform;
+}
+
 /* Contact cards ----------------------------------------------------------- */
 #contacts-cards{
+    /* Above the particles canvas. */
+    position:relative;
+    z-index:1;
+
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -32,10 +78,12 @@
 
     /* Full window width so staggered cards reach the left/right window edges,
        with a small inset so they sit near the border without touching it.
-       Vertical padding gives the top/bottom cards' glow room to breathe. */
+       Top/bottom spacing is owned by #contacts's padding. Height must stay
+       content-driven: contacts.js splits the cards at the viewport fold, and
+       the below-the-fold list needs the container (and section) to grow. */
     width:100%;
-    padding:60px 30px;
     box-sizing:border-box;
+    padding:0 30px;
 }
 
 .contact-card{
