@@ -305,11 +305,23 @@ function moveSliderTo(target) {
 
     const currentLeft = slider.offsetLeft;
     const newWidth = target.offsetWidth + SLIDER_PAD;
-    const newLeft = target.offsetLeft - SLIDER_PAD / 2;
+    // Never let the halo poke past the bar's left edge (first tab sits close).
+    const newLeft = Math.max(target.offsetLeft - SLIDER_PAD / 2, 2);
 
     slider.classList.add("moving");
     slider.style.width = `${newWidth}px`;
     slider.style.left = `${newLeft}px`;
+
+    // When the bar scrolls (phone chips), keep the selected tab in view.
+    if (navbar && navbar.scrollWidth > navbar.clientWidth) {
+        const chipLeft = target.offsetLeft - 40;
+        const chipRight = target.offsetLeft + target.offsetWidth + 40;
+        if (chipLeft < navbar.scrollLeft) {
+            navbar.scrollTo({ left: chipLeft, behavior: "smooth" });
+        } else if (chipRight > navbar.scrollLeft + navbar.clientWidth) {
+            navbar.scrollTo({ left: chipRight - navbar.clientWidth, behavior: "smooth" });
+        }
+    }
 
     // Left isn't actually changing (e.g. a press-release with no drag), so
     // no "left" transitionend will ever fire to clear the dimmed glow.
@@ -348,6 +360,18 @@ export async function initMyWorks() {
 
     const initialActive = document.querySelector(".works_section.active") || document.querySelector(".works_section");
     moveSliderTo(initialActive);
+
+    // On phones the selector leaves the tabs bar and floats in the dock by the
+    // bottom navigation (portfolio.js slides the dock in/out per section).
+    // Clearing first drops the stale selector left from a previous visit.
+    const dock = document.getElementById("style-selector-dock");
+    if (dock) {
+        dock.replaceChildren();
+        const selector = document.querySelector(".style-selector");
+        if (selector && window.matchMedia("(max-width: 680px)").matches) {
+            dock.appendChild(selector);
+        }
+    }
 
     // Guards against a click landing mid-transition (e.g. clicking line then
     // grid again before the first exit animation finishes) - without this,

@@ -84,6 +84,11 @@ function buildShell() {
             </div>
 
             <div id="portfolio-active-content"></div>
+
+            <!-- Phone only: floating line/grid switcher docked by the bottom
+                 navigation. my_works.js moves its selector in here; it slides
+                 in from the right while My Works is the open section. -->
+            <div id="style-selector-dock"></div>
         </div>
     `;
 
@@ -134,6 +139,11 @@ function renderPortfolio(active) {
 
     if (!shellBuilt) buildShell();
     updateClicked(active);
+
+    // The floating selector only belongs to My Works - slide it away (to the
+    // right) as soon as another section is chosen, back in when returning.
+    document.getElementById("style-selector-dock")
+        ?.classList.toggle("dock-shown", active === "myWorks");
 
     if (activeSection === null) {
         firstMount(active);

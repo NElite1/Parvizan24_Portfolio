@@ -426,18 +426,45 @@
 /* Phone: lines keep image + name + skill (tap opens the full detail anyway);
    grid cards go single-column. ---------------------------------------------- */
 @media (max-width:680px){
+    /* One row of scrollable chips: full-size tabs slide sideways under a
+       selector pinned to the right edge (sticky inside the scroller). */
     #portfolio-active-content-navbar{
         height:44px;
+        justify-content:flex-start;
+        gap:8px;
+        overflow-x:auto;
+        overflow-y:hidden;
+        box-sizing:border-box;
+        padding:0 8px;
     }
     #slider{
         height:39px;
     }
     .works_section{
-        font-size:0.72rem;
+        flex:0 0 auto;
+        font-size:0.8rem;
         white-space:nowrap;
+        padding:0 10px;
     }
+    /* Docked look: the selector lives in #style-selector-dock (moved there by
+       my_works.js), floating over the content with the site's neon halo. */
     .style-selector{
-        display:none;
+        width:72px;
+        height:38px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,.08);
+        box-shadow:
+            0 8px 20px rgba(0,0,0,.55),
+            0 0 14px -4px var(--secondary-color);
+    }
+    .style-selector button img{
+        width:18px;
+        height:18px;
+    }
+    .style-selector button.active{
+        width:28px;
+        height:28px;
+        border-radius:8px;
     }
 
     .my-work-panel{
@@ -472,9 +499,30 @@
         flex-direction:column;
         width:100%;
         height:auto;
+        padding:12px;
+        gap:12px;
+
+        /* Same neon language as the rest of the site: a quiet purple halo and
+           a lifted edge, so the cards glow instead of sitting flat. */
+        border:1px solid rgba(255,255,255,.07);
+        box-shadow:
+            0 10px 24px rgba(0,0,0,.45),
+            0 0 16px -6px var(--secondary-color),
+            inset 0 1px 0 rgba(255,255,255,.06);
     }
     .grid-image{
-        min-height:130px;
+        min-height:150px;
+        border:1px solid rgba(255,255,255,.05);
+    }
+    .grid-info{
+        gap:8px;
+    }
+    .grid-name{
+        padding:0 4px;
+        letter-spacing:.01em;
+    }
+    .grid-description{
+        padding:12px;
     }
 
     .work-detail-overlay{
@@ -489,12 +537,8 @@
     }
 }
 
-/* Small phone: four tabs still share one row -------------------------------- */
+/* Small phone ---------------------------------------------------------------- */
 @media (max-width:400px){
-    .works_section{
-        font-size:0.6rem;
-        letter-spacing:0;
-    }
     .my-work-skill{
         width:26%;
     }

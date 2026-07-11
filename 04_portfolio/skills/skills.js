@@ -117,11 +117,23 @@ function moveSliderTo(target) {
 
     const currentLeft = slider.offsetLeft;
     const newWidth = target.offsetWidth + SLIDER_PAD;
-    const newLeft = target.offsetLeft - SLIDER_PAD / 2;
+    // Never let the halo poke past the bar's left edge (first tab sits close).
+    const newLeft = Math.max(target.offsetLeft - SLIDER_PAD / 2, 2);
 
     slider.classList.add("moving");
     slider.style.width = `${newWidth}px`;
     slider.style.left = `${newLeft}px`;
+
+    // When the bar scrolls (phone chips), keep the selected tab in view.
+    if (navbar && navbar.scrollWidth > navbar.clientWidth) {
+        const chipLeft = target.offsetLeft - 40;
+        const chipRight = target.offsetLeft + target.offsetWidth + 40;
+        if (chipLeft < navbar.scrollLeft) {
+            navbar.scrollTo({ left: chipLeft, behavior: "smooth" });
+        } else if (chipRight > navbar.scrollLeft + navbar.clientWidth) {
+            navbar.scrollTo({ left: chipRight - navbar.clientWidth, behavior: "smooth" });
+        }
+    }
 
     if (Math.round(currentLeft) === Math.round(newLeft)) slider.classList.remove("moving");
 }

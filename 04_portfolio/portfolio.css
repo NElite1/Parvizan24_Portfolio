@@ -251,6 +251,12 @@
     }
 }
 
+/* Floating line/grid dock: phone-only home for the My Works style selector
+   (my_works.js moves it here). Hidden everywhere else. */
+#style-selector-dock{
+    display:none;
+}
+
 /* One section. Each fills the strip's visible height so stacking them gives an
    exact one-panel (=100%) step per section. */
 .section-content{
@@ -341,6 +347,27 @@
         height:92vh;
         min-height:570px;
         padding:15px 0;
+        /* The dock slides off the right edge - clip it instead of letting the
+           page grow a horizontal scrollbar. */
+        overflow:clip;
+    }
+
+    /* The style selector floats centered just above the bottom navigation.
+       Hidden state sinks it straight down behind the (opaque, higher) nav bar,
+       so it rises from the bar when My Works opens and dives back when not. */
+    #style-selector-dock{
+        display:block;
+        position:absolute;
+        left:50%;
+        /* Rides just above the bottom navigation. */
+        bottom:109px;
+        z-index:20;
+
+        transform:translate(-50%, 80px);
+        transition:transform .35s ease;
+    }
+    #style-selector-dock.dock-shown{
+        transform:translate(-50%, 0);
     }
     #portfolio-navigation-activated{
         flex-direction:row;
@@ -353,6 +380,8 @@
         margin:15px 15px 0;
         /* The pill is hidden in the horizontal bar - no clearance needed. */
         padding-top:0;
+        /* Above the style-selector dock, so the dock hides behind this bar. */
+        z-index:21;
     }
     #portfolio-websection-logo-activated{
         display:none;
@@ -377,6 +406,12 @@
         min-height:0;
         margin:0 15px;
         order:1;
+        transition:margin-bottom .35s ease;
+    }
+    /* While the dock is up, the content panel shortens just enough for the
+       selector's own lane - list touches dock, dock touches nav, no overlap. */
+    #portfolio-content-activated:has(> #style-selector-dock.dock-shown) #portfolio-active-content{
+        margin-bottom:33px;
     }
     .section-strip{
         inset:10px;
@@ -388,6 +423,16 @@
     #portfolio-navigation-activated{
         height:80px;
         margin:12px 10px 0;
+    }
+    #style-selector-dock{
+        bottom:101px;
+        transform:translate(-50%, 72px);
+    }
+    #style-selector-dock.dock-shown{
+        transform:translate(-50%, 0);
+    }
+    #portfolio-content-activated:has(> #style-selector-dock.dock-shown) #portfolio-active-content{
+        margin-bottom:36px;
     }
     #portfolio-active-content{
         margin:0 10px;
