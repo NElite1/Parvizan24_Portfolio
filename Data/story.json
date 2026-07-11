@@ -5,24 +5,35 @@
         "hint": "open the book"
     },
     "section_1": {
-        "topic": "Where it all began",
-        "period": "1974 - 1990",
+        "topic": "E3-22",
+        "period": "2022-2024",
         "layout": "auto",
-        "content": [
-            "Every story has a beginning, and mine starts in a small room with a big window. The light came in every morning like it had somewhere important to be, and so did I, even before I knew where.",
+        "content": 
+            [
+            "I couldn't even imagine that one period, even though it was the shortest of all I had, would change my life for the better.",
             "[photo_1]",
-            "My mother says I asked questions before I could properly walk. Why is the sky doing that. Where does the water go. What is inside a radio. Nobody had all the answers, and somehow that felt like a promise rather than a problem.",
+            "Well, I am not good at storytelling, so I will just say everything as it was. Before lyceum, I was a boy whose lifestyle was simple: nothing interesting, no chasing dreams, no hard work, and so on.",
+            "But when I started studying in group E3-22 (Third Economic Group of 2022), I changed completely.",
+            "There I met lots of people who somehow changed my life.  I met people who were always happy, who knew everything, who were just funny, who kept pushing until it was over, who were always right, and so on :) And most importantly had some philosophical moment of my life.",
+            "In this section, I just want to say a little bit about the people who somehow changed me.",
+            "Well, I think that telling you about all 25 group members would be too long and kind of off-topic, so I will talk about some people, both boys and girls.",
+            "Boys: Funny members, always making others happy, cheering everyone up, and just having a good time. I don't even know how to describe them; well, they were the main emotions and the engine of our group.",
+            "Girls: While the boys were the emotions and the engine of our group, the girls were the ones who created a rollercoaster for those emotions and were the fuel for that engine. It might sound like the boys were more important than the girls, but I can say that is not true. It is just because I am also a boy and spent more time with the boys than the girls...",
+            "And specific people: Well, there are only two people that I want to point out: one boy and one girl.",
+            "Mukhammad Amin: Well, he is just funny, and he is the reason why I started watching F1... Okay, seriously, he is a person who is just there when you need him. And that's why I pointed him out. He was just there when I was alone (: Reminding me, that kindness still exists",
+            "One girl (I can't say her name, as I haven't asked for permission :) ): Sooo, about her, the only thing that I can say is that I was scared of her. Listen, I am not scared of darkness, risk, stupid actions, or loneliness, but I was scared of her in one specific way. Her aura was too powerful. The way she defended her ideology made me scared of her... Okay, now, if you are thinking that I am kidding, I am not. She had her aura, I had my aura, and I was scared of losing to her aura's power (just think of it as the battle between Madara and Hashirama). It was a matter of honor. The way she talked, the way she acted—I couldn't lose any aura points, so I was scared, scared of losing to her.",
+            "But she was a good rival. Still, I don't know anyone who has as powerful an aura as she did. Maybe she was the reason why I defend my ideology regardless of my losses.",
             "[quote_1]",
-            "By the time I was ten, I had taken apart three clocks and successfully reassembled none of them. But I had learned the most important lesson of my life: things are made of smaller things, and smaller things can be understood."
+            "There started my transformation journey: boys with whom I did stupid things and speedran Math, and girls (mostly one of them) who showed me how to defend my ideas."
         ],
         "photos": {
             "photo_1": {
-                "src": "Data/story_photos/placeholder_1.svg",
-                "caption": "The room with the big window."
+                "src": "Data/story_photos/E3-22_lyceum.jpg",
+                "caption": "My groupmates :)"
             }
         },
         "quotes": {
-            "quote_1": "Curiosity was never a phase for me. It was the whole personality."
+            "quote_1": "Don't laugh, it is true, that girl's aura still is too powerfull."
         }
     },
     "section_2": {
