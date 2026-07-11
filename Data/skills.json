@@ -1,0 +1,27 @@
+{
+"programming": {
+    "skill_1": {
+        "name":"Linux user",
+        "short_description": "I am writing it, because I am going to use Kali Linux (right now Ubuntu)",
+        "long_description": "long description",
+        "photo": ""},
+    "skill_2": {
+        "name":"Frontend developer ",
+        "short_description": "HTML, CSS, JS and Vibe Coding: I use main frontend technologies to create a website, and I vibe code to use libraries and frameworks like: React or Tailwind CSS",
+        "long_description": "long description",
+        "photo": ""},
+    "skill_3": {
+        "name":"Backend developer ",
+        "short_description": "Python, Go, JS, SQL and Vive Coding: Backend is different, more coding then AI, because I like to think about DSA, but still I vibe code",
+        "long_description": "long description",
+        "photo": ""}
+},
+"design": {
+    "skill_1": {
+        "name":"Web Design ",
+        "short_description": "I am programmer, but to understand process better, I learned web design, so I design platforms as well. Example: this website",
+        "long_description": "long description",
+        "photo": ""}
+}
+}
+

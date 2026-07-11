@@ -27,8 +27,10 @@
   flex:3;
   display:flex;
   flex-direction:row;
-  justify-content:space-evenly;
+  justify-content:end;
   align-items:center;
+  gap:50px;
+  padding-right:100px;
   
 }
 .navlink{
@@ -36,23 +38,20 @@
   flex-direction:row;
   justify-content:center;
   align-items:center;
+  gap:5px;
   width:150px;
-  background-color:var(--layer0);
   height:30px;
   border-width:0px;
   border-radius:15px;
-  filter:
-     drop-shadow(0 0 5px var(--secondary-color))
-     drop-shadow(0 0 15px var(--secondary-color))
-    ;
   transition: hover, 0.2s;
 }
 .navlink:hover{
   width:175px;
   filter:
-    drop-shadow(0 0 5px var(--main-color))
-    drop-shadow(0 0 15px var(--main-color))
+    drop-shadow(0 0 10px var(--secondary-color))
+    drop-shadow(0 0 20px var(--secondary-color))
     ;
+  text-decoration:underline;
 }
 .navlink-icon{
   width:24px;

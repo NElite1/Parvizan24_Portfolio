@@ -1,0 +1,137 @@
+/* Skills list ------------------------------------------------------------- */
+.skill-panel{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:start;
+    align-items:stretch;
+
+    box-sizing:border-box;
+    padding:15px;
+    padding-top:20px;
+    overflow-y:auto;
+}
+
+.skill-line{
+    display:flex;
+    flex-direction:row;
+    justify-content:start;
+    align-items:center;
+    gap:10px;
+
+    width:100%;
+    height:75px;
+    margin-bottom:10px;
+    padding-left:10px;
+    padding-right:10px;
+    border-radius:20px;
+
+    background-color:#252525;
+
+    cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+}
+.skill-line:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(0,0,0,.4);
+}
+/* Reuses the line-slide-in keyframe defined in my_works.css. */
+.skill-line.entering{
+    animation:line-slide-in .4s ease both;
+}
+
+.skill-box{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:start;
+
+    height:65px;
+    box-sizing:border-box;
+    background-color:var(--layer0);
+    border-radius:15px;
+    padding:10px 25px;
+}
+.skill-name{
+    width:20%;
+    font-weight:600;
+}
+.skill-short-description{
+    flex:1;
+}
+
+/* Skill detail overlay ("iframe") ----------------------------------------- */
+.skill-detail-overlay{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+    box-sizing:border-box;
+    padding:25px;
+    overflow-y:auto;
+
+    background-color:#1c1c1c;
+    border-radius:25px;
+
+    z-index:10;
+    animation:skill-detail-in .3s ease both;
+}
+@keyframes skill-detail-in{
+    from{ opacity:0; transform:scale(.98); }
+    to{ opacity:1; transform:scale(1); }
+}
+
+.skill-detail-close{
+    position:absolute;
+    top:15px;
+    right:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:34px;
+    height:34px;
+
+    background-color:var(--layer0);
+    color:#fff;
+    border:none;
+    border-radius:50%;
+
+    font-size:16px;
+    cursor:pointer;
+    transition:background-color .2s ease;
+}
+.skill-detail-close:hover{
+    background-color:var(--layer2);
+}
+
+.skill-detail-name{
+    margin:0;
+    padding-right:44px;
+    font-size:26px;
+    font-weight:700;
+    text-transform:capitalize;
+}
+.skill-detail-short{
+    color:var(--main-color);
+    font-weight:500;
+}
+.skill-detail-long{
+    box-sizing:border-box;
+    background-color:var(--layer0);
+    border-radius:15px;
+    padding:25px;
+    line-height:1.6;
+    opacity:.85;
+}
+.skill-detail-photo{
+    max-width:100%;
+    border-radius:15px;
+    margin-top:6px;
+}

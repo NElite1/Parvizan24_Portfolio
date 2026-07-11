@@ -1,0 +1,54 @@
+{
+    "soft_1": {
+        "soft_name": "Telegram",
+        "icon": "icons/Social_media_logos/telegram.svg",
+        "type": "Chat",
+        "handle": "@ParvizaN24",
+        "link": "https://t.me/ParvizaN24",
+        "button": "Write",
+        "accent": "#29a9eb",
+        "description": "I use Telegram as main sort for communication. There we can talk about:",
+        "points": [
+            "Freelance tasks (Some digital products)",
+            "Business partnership",
+            "And just have a nice talk :)"
+        ],
+        "note": "Keep it simple, just write, we figure out details later"
+    },
+    "soft_2": {
+        "soft_name": "Instagram",
+        "icon": "icons/Social_media_logos/instagram.png",
+        "type": "Social",
+        "handle": "@ParvizaN24",
+        "link": "#",
+        "button": "Follow",
+        "accent": "#e1306c",
+        "description": "Content coming soon.",
+        "points": [],
+        "note": ""
+    },
+    "soft_3": {
+        "soft_name": "YouTube",
+        "icon": "icons/Social_media_logos/youtube.png",
+        "type": "Videos",
+        "handle": "@ParvizaN24",
+        "link": "#",
+        "button": "Subscribe",
+        "accent": "#ff0000",
+        "description": "Content coming soon.",
+        "points": [],
+        "note": ""
+    },
+    "soft_4": {
+        "soft_name": "X",
+        "icon": "icons/Social_media_logos/logo-white.png",
+        "type": "Social",
+        "handle": "@ParvizaN24",
+        "link": "#",
+        "button": "Follow",
+        "accent": "#ffffff",
+        "description": "Content coming soon.",
+        "points": [],
+        "note": ""
+    }
+}

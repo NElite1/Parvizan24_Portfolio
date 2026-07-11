@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="01_parvizan24/parvizan24.css">
+  <link rel="stylesheet" href="06_story/story.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Story+Script&display=swap" rel="stylesheet">
+  <style>
+    /* Harness only: kill transitions so a one-shot headless screenshot shows
+       the final (settled) state instead of a mid-transition frame. */
+    *{ transition:none !important; animation:none !important; }
+    .story-reveal{ opacity:1 !important; transform:none !important; }
+  </style>
+</head>
+<body>
+  <div id="story">
+    <div id="story-book"></div>
+  </div>
+  <script type="module" src="06_story/story.js"></script>
+  <script>
+    // Harness only: drive the real book into a given state for screenshots.
+    // #open -> open cover; #s2 -> open + jump to the chess section (section_2).
+    const want = location.hash;
+    const t = setInterval(() => {
+      const cover = document.querySelector(".story-cover");
+      const scroll = document.querySelector(".story-scroll");
+      if (!cover || !scroll) return;
+      clearInterval(t);
+      if (want.includes("open") || want.includes("s2")) {
+        cover.click();
+        cover.style.display = "none"; // remove overlay instantly for the shot
+        // Force reveals visible so the one-shot screenshot isn't mid-fade.
+        document.querySelectorAll(".story-reveal").forEach(e => e.classList.add("in"));
+        if (want.includes("s2")) {
+          const sections = document.querySelectorAll(".story-section");
+          if (sections[1]) scroll.scrollTop = sections[1].offsetTop - 60;
+          scroll.dispatchEvent(new Event("scroll")); // run scrollspy now
+          setTimeout(() => {
+            const y = document.querySelector(".story-year").textContent;
+            const active = document.querySelector(".story-chip.active")?.textContent;
+            console.log("PROBE year=" + y + " activeChip=" + active +
+                        " scrollTop=" + Math.round(scroll.scrollTop) +
+                        " s1top=" + sections[0].offsetTop + " s2top=" + sections[1].offsetTop);
+          }, 1500);
+        }
+      }
+    }, 50);
+  </script>
+</body>
+</html>

@@ -4,13 +4,205 @@
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  height:100vh;
-  min-height:600px;
+  /* Grow with the cards (part of the normal page scroll) but never shorter than
+     a full screen, so a few cards still fill the viewport and stay centered. */
+  min-height:100vh;
   width:100%;
 
-  background: linear-gradient(
+  /* Gradient is pinned to one viewport height at the bottom instead of being
+     stretched over the whole (now variable-height) section - keeps the green
+     glow the same size no matter how many cards there are. */
+  background-color:var(--layer0);
+  background-image: linear-gradient(
     to top,
     var(--layer0) 0%,
     var(--main-color) 5%,
     var(--layer0) 100%);
+  background-repeat:no-repeat;
+  background-size:100% 100vh;
+  background-position:bottom center;
+}
+
+/* Contact cards ----------------------------------------------------------- */
+#contacts-cards{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:30px;
+
+    /* Full window width so staggered cards reach the left/right window edges,
+       with a small inset so they sit near the border without touching it.
+       Vertical padding gives the top/bottom cards' glow room to breathe. */
+    width:100%;
+    padding:60px 30px;
+    box-sizing:border-box;
+}
+
+.contact-card{
+    /* Per-card brand color, set inline from JSON (falls back to site accent). */
+    --accent:var(--main-color);
+
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:26px;
+
+    width:850px;
+    max-width:100%;
+    box-sizing:border-box;
+    padding:26px 30px;
+
+    background:#000;
+    border:1.5px solid var(--accent);
+    border-radius:32px;
+
+    box-shadow:
+        0 0 22px -4px var(--accent),
+        inset 0 0 26px -14px var(--accent);
+
+    transition:box-shadow .3s ease;
+}
+/* Intensify the neon glow on hover. */
+.contact-card:hover{
+    box-shadow:
+        0 0 34px 0 var(--accent),
+        inset 0 0 30px -12px var(--accent);
+}
+
+/* Chessboard order: odd cards sit against the left edge, even cards against the
+   right, and even cards also mirror so the logo hugs the outer edge each time. */
+.contact-card:nth-child(odd){
+    align-self:flex-start;
+}
+.contact-card:nth-child(even){
+    align-self:flex-end;
+    flex-direction:row-reverse;
+}
+
+.contact-card-logo{
+    flex:0 0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:150px;
+    height:150px;
+    border-radius:50%;
+
+    background:radial-gradient(circle at 50% 45%,
+        color-mix(in srgb, var(--accent) 28%, transparent),
+        transparent 72%);
+}
+.contact-card-logo img{
+    width:95px;
+    height:95px;
+    object-fit:contain;
+}
+/* Telegram is a circular badge - let it fill the circle like before. */
+.contact-card-logo.logo-telegram img{
+    width:150px;
+    height:150px;
+}
+/* Instagram and YouTube read heavier than the thin X mark - trim them a touch
+   so all three look the same visual size. */
+.contact-card-logo.logo-instagram img,
+.contact-card-logo.logo-youtube img{
+    width:110px;
+    height:110px;
+}
+
+.contact-card-meta{
+    flex:0 0 auto;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+
+    min-width:140px;
+    text-align:center;
+}
+.contact-meta-row{
+    margin:0;
+    font-size:16px;
+    color:#fff;
+}
+.contact-meta-label{
+    color:rgba(255,255,255,.5);
+}
+.contact-handle{
+    color:var(--accent);
+    text-decoration:none;
+    font-weight:500;
+}
+.contact-handle:hover{
+    text-decoration:underline;
+}
+.contact-write{
+    margin-top:6px;
+    padding:8px 26px;
+    margin-top:35px;
+
+    background:var(--accent);
+    color:var(--accent-text, #fff);
+    font-weight:600;
+    text-decoration:none;
+
+    border-radius:20px;
+    transition:transform .2s ease, box-shadow .2s ease;
+}
+.contact-write:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 16px -4px var(--accent);
+}
+
+.contact-card-body{
+    flex:1;
+    min-width:0;
+    align-self:stretch;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    box-sizing:border-box;
+    padding:20px 24px;
+
+    border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius:24px;
+}
+.contact-desc{
+    margin:0;
+    color:rgba(255,255,255,.9);
+    line-height:1.5;
+}
+.contact-points{
+    margin:0;
+    padding-left:20px;
+
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+
+    color:rgba(255,255,255,.8);
+    line-height:1.5;
+}
+.contact-note{
+    margin:0;
+    color:rgba(255,255,255,.55);
+    font-style:italic;
+    line-height:1.5;
+}
+
+@media (max-width:680px){
+    .contact-card,
+    .contact-card:nth-child(even){
+        flex-direction:column;
+        text-align:center;
+    }
+    .contact-card-body{
+        align-self:auto;
+    }
 }
