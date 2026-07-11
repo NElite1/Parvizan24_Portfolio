@@ -116,3 +116,37 @@
         transform:translateY(0);
     }
 }
+
+/* Tablet ------------------------------------------------------------------- */
+@media (max-width:1024px){
+    .projects-soon-orb{
+        width:130px;
+        height:130px;
+    }
+    .projects-soon-title{
+        font-size:32px;
+    }
+    .projects-soon-line{
+        font-size:19px;
+    }
+}
+
+/* Phone -------------------------------------------------------------------- */
+@media (max-width:680px){
+    .projects-soon{
+        box-sizing:border-box;
+        padding:0 14px;
+        gap:14px;
+    }
+    .projects-soon-orb{
+        width:100px;
+        height:100px;
+        margin-bottom:8px;
+    }
+    .projects-soon-title{
+        font-size:24px;
+    }
+    .projects-soon-line{
+        font-size:15px;
+    }
+}

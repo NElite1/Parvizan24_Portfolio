@@ -115,74 +115,6 @@ function metaRow(label, value) {
     return row;
 }
 
-// How far past the first-viewport edge the below-the-fold list starts, so its
-// neon glow (box-shadow) doesn't bleed into the first view either.
-const FOLD_GLOW_PAD = 24;
-
-// Splits the rendered cards at the viewport fold. Walking the cards in order,
-// while card height + gap + the section's own top/bottom paddings still fit
-// inside 100vh, the card belongs to the first (immediately visible) list.
-// Every remaining card is already in the DOM (prerendered - images load, layout
-// is ready) but gets pushed below the first viewport, so with the section
-// opened at 100% the user doesn't see it until they continue scrolling.
-// The push is one margin-top on the first overflow card: the cards stay direct
-// children of #contacts-cards, keeping the nth-child chessboard intact.
-function layoutFold() {
-    const section = document.getElementById("contacts");
-    const container = document.getElementById("contacts-cards");
-    if (!section || !container) return;
-
-    const cards = [...container.children];
-    if (cards.length === 0) return;
-
-    // Clear a previous fold before re-measuring (e.g. on resize).
-    cards.forEach(card => { card.style.marginTop = ""; });
-
-    const sectionStyle = getComputedStyle(section);
-    const padTop = parseFloat(sectionStyle.paddingTop) || 0;
-    const padBottom = parseFloat(sectionStyle.paddingBottom) || 0;
-    const gap = parseFloat(getComputedStyle(container).rowGap) || 0;
-
-    // Vertical space the first list may occupy inside one viewport.
-    const budget = window.innerHeight - padTop - padBottom;
-
-    let used = 0;
-    let foldIndex = -1;
-    for (let i = 0; i < cards.length; i++) {
-        const next = used + (i > 0 ? gap : 0) + cards[i].offsetHeight;
-        if (next > budget) {
-            foldIndex = i;
-            break;
-        }
-        used = next;
-    }
-
-    // Everything fits (-1), or not even the first card does (0) - no fold.
-    if (foldIndex <= 0) return;
-
-    // The leftover viewport space (the room the first overflow card "gave up")
-    // is split into equal parts and added to every gap between the visible
-    // cards, so the first view is filled edge-to-padding instead of leaving a
-    // dead band above the fold. Works for any visible count; with a single
-    // visible card there are no gaps to grow, so it just stays at the top.
-    const visibleCount = foldIndex;
-    const leftover = budget - used;
-    let spread = 0;
-    if (visibleCount > 1 && leftover > 0) {
-        spread = leftover / (visibleCount - 1);
-        for (let i = 1; i < visibleCount; i++) {
-            cards[i].style.marginTop = `${spread}px`;
-        }
-    }
-
-    // Where the overflow card would naturally sit (including the widened gaps)
-    // vs. where the fold is, both measured from the section's top edge.
-    const naturalTop = padTop + used + spread * (visibleCount - 1) + gap;
-    const foldTop = window.innerHeight + FOLD_GLOW_PAD;
-    const push = foldTop - naturalTop;
-    if (push > 0) cards[foldIndex].style.marginTop = `${push}px`;
-}
-
 // Cursor glow-snake: a chain of soft purple blobs. While the cursor moves,
 // each blob eases toward the one ahead of it, so the chain stretches into a
 // snake slithering after the mouse. When the cursor rests, the blobs' targets
@@ -302,8 +234,6 @@ function initSpotlight() {
     });
 }
 
-let foldResizeTimer = 0;
-
 async function initContacts() {
     const container = document.getElementById("contacts-cards");
     if (!container) return;
@@ -312,15 +242,6 @@ async function initContacts() {
     contactsData = await response.json();
 
     container.replaceChildren(...Object.values(contactsData).map(buildCard));
-    layoutFold();
-
-    // Re-split when the viewport changes, and once more after everything
-    // (fonts, images) has loaded in case card heights settled.
-    window.addEventListener("resize", () => {
-        clearTimeout(foldResizeTimer);
-        foldResizeTimer = setTimeout(layoutFold, 150);
-    });
-    window.addEventListener("load", layoutFold);
 }
 
 initContacts();

@@ -426,10 +426,36 @@
   background:rgba(255,255,255,.18);
 }
 
+/* Tablet: same book, a little wider in the window ------------------------- */
+@media (max-width:1024px){
+  #story-book{
+    width:90%;
+  }
+  .story-section{
+    padding:0 32px 32px;
+  }
+  .story-section-header{
+    margin:0 -32px 22px;
+    padding:18px 32px 14px;
+  }
+}
+
 /* Small screens: chess rows stack ---------------------------------------- */
 @media (max-width:680px){
+  #story{
+    padding:12px;
+  }
+  #story-book{
+    width:100%;
+    height:min(88vh, 900px);
+  }
   .story-section{
-    padding:30px 24px;
+    padding:0 20px 30px;
+  }
+  /* Header's full-bleed margins must mirror the section's side padding. */
+  .story-section-header{
+    margin:0 -20px 18px;
+    padding:14px 20px 12px;
   }
   .story-chips{
     padding:14px 24px;
@@ -437,5 +463,13 @@
   .story-row,
   .story-row.reversed{
     flex-direction:column;
+  }
+  .story-period-badge{
+    right:10px;
+    bottom:10px;
+    font-size:12px;
+  }
+  .story-cover{
+    padding:24px;
   }
 }

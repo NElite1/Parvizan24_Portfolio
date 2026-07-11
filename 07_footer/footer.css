@@ -18,3 +18,23 @@
   margin:0;
   padding:0 24px;
 }
+
+/* Tablet ------------------------------------------------------------------- */
+@media (max-width:1024px){
+  #footer{
+    height:170px;
+  }
+  #footer-signature{
+    font-size:1rem;
+  }
+}
+
+/* Phone -------------------------------------------------------------------- */
+@media (max-width:680px){
+  #footer{
+    height:130px;
+  }
+  #footer-signature{
+    font-size:0.92rem;
+  }
+}

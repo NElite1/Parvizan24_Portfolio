@@ -108,13 +108,19 @@ function setActive(target) {
     showTab(target.textContent);
 }
 
+// The slider hugs whatever tab it selects: its width follows the tab's width
+// (plus a little breathing room for the glow), on every screen size.
+const SLIDER_PAD = 26;
+
 function moveSliderTo(target) {
     if (!slider || !target) return;
 
     const currentLeft = slider.offsetLeft;
-    const newLeft = target.offsetLeft + (target.offsetWidth - slider.offsetWidth) / 2;
+    const newWidth = target.offsetWidth + SLIDER_PAD;
+    const newLeft = target.offsetLeft - SLIDER_PAD / 2;
 
     slider.classList.add("moving");
+    slider.style.width = `${newWidth}px`;
     slider.style.left = `${newLeft}px`;
 
     if (Math.round(currentLeft) === Math.round(newLeft)) slider.classList.remove("moving");

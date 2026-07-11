@@ -21,6 +21,10 @@
     align-items:center;
     gap:10px;
 
+    /* Never let the panel's flex layout squash a line below its content -
+       when the list is taller than the panel, the panel scrolls instead. */
+    flex-shrink:0;
+
     width:100%;
     height:75px;
     margin-bottom:10px;
@@ -134,4 +138,42 @@
     max-width:100%;
     border-radius:15px;
     margin-top:6px;
+}
+
+/* Phone: lines wrap into two rows instead of squeezing one ------------------ */
+@media (max-width:680px){
+    .skill-panel{
+        padding:10px;
+        padding-top:12px;
+    }
+    .skill-line{
+        flex-wrap:wrap;
+        height:auto;
+        min-height:60px;
+        padding:8px;
+        gap:8px;
+    }
+    .skill-box{
+        height:auto;
+        min-height:44px;
+        padding:8px 12px;
+    }
+    .skill-name{
+        width:auto;
+        min-width:35%;
+    }
+    .skill-short-description{
+        flex:1 1 100%;
+    }
+
+    .skill-detail-overlay{
+        padding:18px;
+        gap:12px;
+    }
+    .skill-detail-name{
+        font-size:20px;
+    }
+    .skill-detail-long{
+        padding:16px;
+    }
 }

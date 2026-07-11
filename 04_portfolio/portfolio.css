@@ -128,9 +128,12 @@
     flex-direction:column;
     justify-content:space-evenly;
     align-items:center;
-    height:100%;    
+    height:100%;
     width:150px;
     margin:0 25px 0 25px;
+    box-sizing:border-box;
+    /* Keeps the section cards clear of the absolute "Portfolio" pill above. */
+    padding-top:80px;
 
     background:#141414;
 
@@ -257,4 +260,144 @@
 
     height:100%;
     box-sizing:border-box;
+}
+
+/* Tablet: identical layout, every block one step smaller ------------------- */
+@media (max-width:1024px){
+    .portfolio-section{
+        width:170px;
+        height:170px;
+    }
+    .portfolio-section-icon{
+        width:126px;
+        height:126px;
+    }
+    .portfolio-section:hover{
+        width:188px;
+        height:188px;
+    }
+
+    #portfolio-navigation-activated{
+        width:112px;
+        margin:0 15px;
+        padding-top:70px;
+    }
+    #portfolio-websection-logo-activated{
+        width:95px;
+        height:40px;
+    }
+    .portfolio-section-activated{
+        width:88px;
+        height:96px;
+    }
+    .portfolio-section-icon-activated{
+        width:50px;
+        height:50px;
+    }
+    .portfolio-section-clicked{
+        width:96px;
+        height:104px;
+    }
+}
+
+/* Phone: idle cards stack; the sidebar becomes a top bar -------------------- */
+@media (max-width:680px){
+    #portfolio{
+        height:auto;
+        min-height:100vh;
+    }
+    #portfolio-content{
+        flex-direction:column;
+        justify-content:center;
+        gap:35px;
+        height:auto;
+        min-height:100vh;
+        box-sizing:border-box;
+        padding:100px 0 60px;
+    }
+    /* That padding is for the idle stacked cards only - once the activated
+       shell is mounted inside the same container, drop it. */
+    #portfolio-content:has(> #portfolio-content-activated){
+        padding:0;
+        min-height:0;
+        justify-content:flex-start;
+    }
+    .portfolio-section{
+        width:140px;
+        height:140px;
+    }
+    .portfolio-section-icon{
+        width:100px;
+        height:100px;
+    }
+    .portfolio-section:hover{
+        width:140px;
+        height:140px;
+    }
+
+    /* Activated: navigation moves to the top, content fills the rest. */
+    #portfolio-content-activated{
+        flex-direction:column;
+        height:92vh;
+        min-height:570px;
+        padding:15px 0;
+    }
+    #portfolio-navigation-activated{
+        flex-direction:row;
+        justify-content:space-evenly;
+        width:auto;
+        height:88px;
+        flex-shrink:0;
+        /* Bottom tab bar: sits under the content, away from the site navbar. */
+        order:2;
+        margin:15px 15px 0;
+        /* The pill is hidden in the horizontal bar - no clearance needed. */
+        padding-top:0;
+    }
+    #portfolio-websection-logo-activated{
+        display:none;
+    }
+    .portfolio-section-activated{
+        width:82px;
+        height:66px;
+    }
+    .portfolio-section-activated h3{
+        font-size:0.7rem;
+    }
+    .portfolio-section-icon-activated{
+        width:32px;
+        height:32px;
+    }
+    .portfolio-section-clicked{
+        width:86px;
+        height:70px;
+    }
+    #portfolio-active-content{
+        flex:1;
+        min-height:0;
+        margin:0 15px;
+        order:1;
+    }
+    .section-strip{
+        inset:10px;
+    }
+}
+
+/* Small phone: tighter margins, slimmer section buttons ---------------------- */
+@media (max-width:400px){
+    #portfolio-navigation-activated{
+        height:80px;
+        margin:12px 10px 0;
+    }
+    #portfolio-active-content{
+        margin:0 10px;
+    }
+    .portfolio-section-activated{
+        width:76px;
+        height:62px;
+    }
+    .portfolio-section-clicked{
+        width:80px;
+        height:66px;
+    }
 }

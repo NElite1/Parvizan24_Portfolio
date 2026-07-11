@@ -60,6 +60,7 @@
 
     transition:
         left .3s ease,
+        width .3s ease,
         box-shadow .5s ease;
 }
 #slider:active{
@@ -138,6 +139,9 @@
     justify-content:start;
     align-items:center;
     gap:10px;
+
+    /* Never let the panel's flex layout squash a line below its content. */
+    flex-shrink:0;
 
     width:1fr;
     box-sizing:border-box;
@@ -408,4 +412,90 @@
     font-size:14px;
     color:var(--main-color);
     font-weight:600;
+}
+
+/* Tablet: same layout, cards a step smaller --------------------------------- */
+@media (max-width:1024px){
+    .grid{
+        width:100%;
+        max-width:525px;
+        height:250px;
+    }
+}
+
+/* Phone: lines keep image + name + skill (tap opens the full detail anyway);
+   grid cards go single-column. ---------------------------------------------- */
+@media (max-width:680px){
+    #portfolio-active-content-navbar{
+        height:44px;
+    }
+    #slider{
+        height:39px;
+    }
+    .works_section{
+        font-size:0.72rem;
+        white-space:nowrap;
+    }
+    .style-selector{
+        display:none;
+    }
+
+    .my-work-panel{
+        padding:10px;
+        padding-top:12px;
+    }
+    .line{
+        gap:8px;
+        padding:5px 8px;
+    }
+    .my-work-image{
+        flex:0 0 auto;
+        width:56px;
+        height:56px;
+    }
+    .my-work-name{
+        flex:1;
+        width:auto;
+        height:56px;
+    }
+    .my-work-skill{
+        flex:0 0 auto;
+        width:30%;
+        height:56px;
+    }
+    .my-work-description,
+    .my-work-customer-review{
+        display:none;
+    }
+
+    .grid{
+        flex-direction:column;
+        width:100%;
+        height:auto;
+    }
+    .grid-image{
+        min-height:130px;
+    }
+
+    .work-detail-overlay{
+        padding:18px;
+        gap:12px;
+    }
+    .work-detail-name{
+        font-size:20px;
+    }
+    .work-detail-description{
+        padding:16px;
+    }
+}
+
+/* Small phone: four tabs still share one row -------------------------------- */
+@media (max-width:400px){
+    .works_section{
+        font-size:0.6rem;
+        letter-spacing:0;
+    }
+    .my-work-skill{
+        width:26%;
+    }
 }

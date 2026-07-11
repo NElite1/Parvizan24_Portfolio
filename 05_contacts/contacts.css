@@ -74,13 +74,12 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:30px;
+    /* Fixed spacing between cards, the same at every screen size. */
+    gap:24px;
 
     /* Full window width so staggered cards reach the left/right window edges,
        with a small inset so they sit near the border without touching it.
-       Top/bottom spacing is owned by #contacts's padding. Height must stay
-       content-driven: contacts.js splits the cards at the viewport fold, and
-       the below-the-fold list needs the container (and section) to grow. */
+       Top/bottom spacing is owned by #contacts's padding. */
     width:100%;
     box-sizing:border-box;
     padding:0 30px;
@@ -244,13 +243,71 @@
     line-height:1.5;
 }
 
+/* Tablet: smaller logos, same card layout ----------------------------------- */
+@media (max-width:1024px){
+    .contact-card-logo{
+        width:120px;
+        height:120px;
+    }
+    .contact-card-logo img{
+        width:76px;
+        height:76px;
+    }
+    .contact-card-logo.logo-telegram img{
+        width:120px;
+        height:120px;
+    }
+    .contact-card-logo.logo-instagram img,
+    .contact-card-logo.logo-youtube img{
+        width:88px;
+        height:88px;
+    }
+    .contact-meta-row{
+        font-size:15px;
+    }
+}
+
 @media (max-width:680px){
     .contact-card,
     .contact-card:nth-child(even){
         flex-direction:column;
         text-align:center;
+
+        gap:16px;
+        padding:20px 16px;
+        border-radius:24px;
     }
     .contact-card-body{
         align-self:auto;
+        padding:16px 18px;
+    }
+    #contacts-cards{
+        padding:0 16px;
+    }
+    .contact-card-logo{
+        width:88px;
+        height:88px;
+    }
+    .contact-card-logo img{
+        width:56px;
+        height:56px;
+    }
+    .contact-card-logo.logo-telegram img{
+        width:88px;
+        height:88px;
+    }
+    .contact-card-logo.logo-instagram img,
+    .contact-card-logo.logo-youtube img{
+        width:66px;
+        height:66px;
+    }
+    .contact-card-meta{
+        gap:10px;
+    }
+    .contact-meta-row{
+        font-size:14px;
+    }
+    .contact-write{
+        margin-top:8px;
     }
 }

@@ -47,7 +47,56 @@
 #arrow-to-down{
   position:absolute;
   bottom:30px;
-  display:flex; 
+  display:flex;
   justify-content:center;
   align-items:center;
+}
+
+/* Tablet: same two columns, just breathing room at the edges --------------- */
+@media (max-width:1024px){
+  #hero{
+    box-sizing:border-box;
+    padding-left:24px;
+    padding-right:24px;
+    gap:24px;
+  }
+  #hero-content,
+  #hero-photo{
+    flex:0.46;
+  }
+  #arrow-to-down img{
+    width:64px;
+  }
+}
+
+/* Phone: columns stack, text first ------------------------------------------ */
+@media (max-width:680px){
+  #hero{
+    flex-direction:column;
+    justify-content:center;
+    gap:28px;
+    height:auto;
+    min-height:100vh;
+    box-sizing:border-box;
+    padding:90px 24px 80px;
+  }
+  #hero-content{
+    flex:0 0 auto;
+    height:auto;
+    width:100%;
+    gap:16px;
+  }
+  #hero-photo{
+    flex:0 0 auto;
+    height:auto;
+    width:100%;
+  }
+  #arrow-to-down{
+    bottom:18px;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  #arrow-to-down img{
+    width:52px;
+  }
 }
