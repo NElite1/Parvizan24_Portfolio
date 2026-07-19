@@ -65,6 +65,7 @@
   #hero-content,
   #hero-photo{
     flex:0.46;
+    margin-bottom: 0px;
   }
   #arrow-to-down img{
     width:64px;
@@ -87,6 +88,7 @@
     height:auto;
     width:100%;
     gap:16px;
+    margin-bottom: 0px;
   }
   #hero-photo{
     flex:0 0 auto;
