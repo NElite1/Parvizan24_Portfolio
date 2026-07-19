@@ -23,6 +23,46 @@ const MY_WORK_FIELDS = [
     ["my-work-skill", "skill"],
 ];
 
+// One JSON file per tab; the tab (and thus entry.type) is decided by which
+// file an entry lives in, so the files themselves don't carry a "type" field.
+// "Good Person :)" has no file - it just shows an empty-state message.
+const WORKS_FILES = {
+    design: "Data/my_works/design.json",
+    programming: "Data/my_works/programming.json",
+    engineering: "Data/my_works/engineering.json",
+};
+
+// Text shown when a tab has no entries yet. Anything not listed uses the
+// default; the moment its file gains entries they render normally instead.
+const DEFAULT_EMPTY = "No works yet";
+const EMPTY_MESSAGES = {
+    "good person :)": "Will be filled on last update :)",
+};
+
+// A value counts as an image when it looks like a path/URL (has a "." or "/");
+// plain words like "image" stay as literal text (handy placeholders).
+function isImagePath(value) {
+    return typeof value === "string" && /[./]/.test(value);
+}
+
+// Fills a thumbnail cell: a real <img> that fills the frame when the value is
+// a path/URL, otherwise the raw text. Falls back to text if the image 404s.
+function fillImageCell(cell, value) {
+    if (isImagePath(value)) {
+        cell.classList.add("has-image");
+        const img = document.createElement("img");
+        img.src = value;
+        img.alt = "";
+        img.addEventListener("error", () => {
+            cell.classList.remove("has-image");
+            cell.textContent = value;
+        });
+        cell.appendChild(img);
+    } else {
+        cell.textContent = value ?? "";
+    }
+}
+
 function buildPanel(entries, extraClass, buildItem) {
     const panel = document.createElement("div");
     panel.className = extraClass ? `my-work-panel ${extraClass}` : "my-work-panel";
@@ -52,34 +92,48 @@ function openWorkDetail(entry) {
     overlay.appendChild(close);
     overlay.appendChild(name);
 
-    // The image field is placeholder text for now; once it holds a real path
-    // (contains "/" or "."), it renders as an actual image instead.
-    if (entry.image) {
-        if (/[./]/.test(entry.image)) {
-            const img = document.createElement("img");
-            img.className = "work-detail-photo";
-            img.src = entry.image;
-            img.alt = entry.name ?? "";
-            overlay.appendChild(img);
-        } else {
-            const box = document.createElement("div");
-            box.className = "work-detail-image-box";
-            box.textContent = entry.image;
-            overlay.appendChild(box);
-        }
+    // Gallery: render every URL in `images` (any count) as its own image.
+    // When there's no gallery, fall back to the single `image` thumbnail so
+    // the overlay still shows something. Non-path values render as a text box.
+    const gallery = Array.isArray(entry.images) ? entry.images.filter(Boolean) : [];
+    if (gallery.length === 0 && entry.image) gallery.push(entry.image);
+
+    if (gallery.length) {
+        const wrap = document.createElement("div");
+        wrap.className = "work-detail-gallery";
+        gallery.forEach(src => {
+            if (isImagePath(src)) {
+                const img = document.createElement("img");
+                img.className = "work-detail-photo";
+                img.src = src;
+                img.alt = entry.name ?? "";
+                img.addEventListener("error", () => img.remove());
+                wrap.appendChild(img);
+            } else {
+                const box = document.createElement("div");
+                box.className = "work-detail-image-box";
+                box.textContent = src;
+                wrap.appendChild(box);
+            }
+        });
+        overlay.appendChild(wrap);
     }
 
-    if (entry.description) {
+    // The overlay shows the long-form copy, falling back to the short version
+    // (the one shown on the line/grid list) when no full text was written.
+    const descText = entry.fullDescription || entry.description;
+    if (descText) {
         const desc = document.createElement("div");
         desc.className = "work-detail-description";
-        desc.textContent = entry.description;
+        desc.textContent = descText;
         overlay.appendChild(desc);
     }
 
-    if (entry.customerReview) {
+    const reviewText = entry.fullReview || entry.customerReview;
+    if (reviewText) {
         const review = document.createElement("blockquote");
         review.className = "work-detail-review";
-        review.textContent = entry.customerReview;
+        review.textContent = reviewText;
         overlay.appendChild(review);
     }
 
@@ -106,7 +160,8 @@ function buildLinePanel(entries) {
         MY_WORK_FIELDS.forEach(([className, field]) => {
             const el = document.createElement("div");
             el.className = className;
-            el.textContent = entry[field] ?? "";
+            if (field === "image") fillImageCell(el, entry.image);
+            else el.textContent = entry[field] ?? "";
             line.appendChild(el);
         });
 
@@ -122,7 +177,7 @@ function buildGridPanel(entries) {
 
         const image = document.createElement("div");
         image.className = "grid-image";
-        image.textContent = entry.image ?? "";
+        fillImageCell(image, entry.image);
 
         const name = document.createElement("h2");
         name.className = "grid-name";
@@ -144,8 +199,24 @@ function buildGridPanel(entries) {
     });
 }
 
+// An empty-state panel: shown for any tab that has no entries (Engineering
+// until it gets works, Good Person :) always). Same .my-work-panel shell so
+// showTab slides it in/out like any other panel.
+function buildEmptyPanel(type) {
+    const panel = document.createElement("div");
+    panel.className = "my-work-panel my-work-empty-panel";
+
+    const message = document.createElement("div");
+    message.className = "my-work-empty";
+    message.textContent = EMPTY_MESSAGES[type] ?? DEFAULT_EMPTY;
+
+    panel.appendChild(message);
+    return panel;
+}
+
 function buildWorkPanel(type) {
     const entries = worksData.filter(entry => entry.type === type);
+    if (entries.length === 0) return buildEmptyPanel(type);
     return currentStyle === "grid" ? buildGridPanel(entries) : buildLinePanel(entries);
 }
 
@@ -280,8 +351,18 @@ let worksDataPromise = null;
 async function loadWorksData() {
     if (worksData.length > 0) return;
 
+    // Fetch every tab's file in parallel and tag each entry with its type
+    // (taken from the file it came from). A missing or empty file just means
+    // that tab has no works yet - it shows the empty state instead of failing.
     if (!worksDataPromise) {
-        worksDataPromise = fetch("Data/my_works.json").then(response => response.json());
+        worksDataPromise = Promise.all(
+            Object.entries(WORKS_FILES).map(([type, url]) =>
+                fetch(url)
+                    .then(response => response.json())
+                    .then(list => (Array.isArray(list) ? list : []).map(entry => ({ ...entry, type })))
+                    .catch(() => [])
+            )
+        ).then(results => results.flat());
     }
     worksData = await worksDataPromise;
 }

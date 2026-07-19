@@ -1,0 +1,59 @@
+// =====================================================================
+//  MY WORKS - how to add an entry
+// =====================================================================
+//
+//  This file is a TEMPLATE ONLY. It is never loaded by the site (that is
+//  why it can have comments - real .json files cannot).
+//
+//  Real data lives in three files, one per tab:
+//      design.json        -> "Design" tab
+//      programming.json   -> "Programming" tab
+//      engineering.json   -> "Engineering" tab
+//
+//  You do NOT write the "type" field - the tab is decided by WHICH file
+//  the entry sits in. The "Good Person :)" tab has no file; it just shows
+//  a message until the last update.
+//
+//  Each data file is a JSON array [ ... ] of entry objects. Copy the block
+//  below (WITHOUT these comments) into the right file, filling the values.
+//
+// ---------------------------------------------------------------------
+
+[
+    {
+        // Thumbnail shown on the line/grid list.
+        //   - A URL or path (contains "/" or ".") renders as a real image
+        //     that fills its frame, e.g. "profile_photos/site.png"
+        //   - Plain text (no "/" or ".") just shows as text - handy as a
+        //     placeholder while you don't have an image yet.
+        "image": "profile_photos/example.png",
+
+        // Gallery shown INSIDE the detail overlay (opens on click).
+        // Put as many URLs as you like - each renders as its own image.
+        // Leave it as [] to fall back to the single "image" above.
+        "images": [
+            "profile_photos/shot-1.png",
+            "profile_photos/shot-2.png",
+            "profile_photos/shot-3.png"
+        ],
+
+        // Title of the work.
+        "name": "Project name",
+
+        // SHORT text - shown on the line/grid list (keep it one line-ish).
+        "description": "One sentence about the work.",
+
+        // LONG text - shown in the overlay. If left "", the overlay falls
+        // back to the short "description" above.
+        "fullDescription": "The full story: what it is, what you built, the tools, the result. As long as you want.",
+
+        // SHORT review - shown on the line/grid list. Leave "" if none.
+        "customerReview": "\"Loved it!\" - Client",
+
+        // LONG review - shown in the overlay. Falls back to "customerReview".
+        "fullReview": "The complete client testimonial, quoted in full.",
+
+        // Skill tag shown on the list and in the overlay.
+        "skill": "Web Dev"
+    }
+]

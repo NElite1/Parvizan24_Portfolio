@@ -29,22 +29,28 @@
   flex-direction:column;
   justify-content:center;
   flex:0.4;
+  min-width:0; /* let the column shrink instead of forcing its content width */
   height:100%;
   margin-bottom: 200px;
-  align-items:left;
+  align-items:stretch;
   gap:20px;
   z-index: 1;
 }
 #hero-photo{
   flex:0.4;
+  min-width:0; /* without this the 579px image refuses to shrink and crushes the text */
   height:100%;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  align-items:left;
+  align-items:stretch;
   gap:20px;
   position: relative;
   z-index: 1;
+}
+#hero-photo img{
+  max-width:100%;
+  height:auto;
 }
 #arrow-to-down{
   position:absolute;
@@ -72,8 +78,9 @@
   }
 }
 
-/* Phone: columns stack, text first ------------------------------------------ */
-@media (max-width:680px){
+/* Tablet & phone: two columns get too cramped for the photo, so stack them
+   (text first). Kicks in below 900px, covering the awkward 680-1024 range. */
+@media (max-width:900px){
   #hero{
     flex-direction:column;
     justify-content:center;
@@ -103,6 +110,24 @@
   #arrow-to-down img{
     width:52px;
   }
+}
+
+/* The intro block used to be an <h3> (which can't legally hold a <ul>). It's
+   now a <div>, so mirror h3's type here - including the tablet/phone sizes -
+   to keep the copy and the list in the same Inter style as before. */
+#hero-intro{
+  color:var(--text);
+  font-family:Inter, sans-serif;
+  font-size:1rem;
+  font-weight:400;
+  line-height:1.4em;
+  letter-spacing:0.02em;
+}
+@media (max-width:1024px){
+  #hero-intro{ font-size:0.88rem; }
+}
+@media (max-width:680px){
+  #hero-intro{ font-size:0.85rem; }
 }
 
 .spacer{

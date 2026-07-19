@@ -181,11 +181,25 @@ function sectionIndex(item) {
     return [...document.querySelectorAll(".works_section")].indexOf(item);
 }
 
+// Mirrors the live loader: one file per tab, merged with a type tag.
+const WORKS_FILES = {
+    design: "../Data/my_works/design.json",
+    programming: "../Data/my_works/programming.json",
+    engineering: "../Data/my_works/engineering.json",
+};
+
 async function loadWorksData() {
     if (worksData.length > 0) return;
 
-    const response = await fetch("../Data/my_works.json");
-    worksData = await response.json();
+    const lists = await Promise.all(
+        Object.entries(WORKS_FILES).map(([type, url]) =>
+            fetch(url)
+                .then(response => response.json())
+                .then(list => (Array.isArray(list) ? list : []).map(entry => ({ ...entry, type })))
+                .catch(() => [])
+        )
+    );
+    worksData = lists.flat();
 }
 
 function setActive(target) {
