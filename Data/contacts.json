@@ -20,11 +20,15 @@
         "icon": "icons/Social_media_logos/instagram.png",
         "type": "Social",
         "handle": "@ParvizaN24",
-        "link": "#",
+        "link": "https://www.instagram.com/parvizan24?igsh=YjlldG1nZ3Q3ZTlj",
         "button": "Follow",
         "accent": "#e1306c",
-        "description": "Content coming soon.",
-        "points": [],
+        "description": "Instagram, if you want to see what i do everyday, or what i am thinking about via photos, then welcome :)",
+        "points": [
+            "Posts, as a photo",
+            "Videos of my life, descipline and improvement :)",
+            "Chats, but telegram is better"
+        ],
         "note": ""
     },
     "soft_3": {
@@ -32,11 +36,15 @@
         "icon": "icons/Social_media_logos/youtube.png",
         "type": "Videos",
         "handle": "@ParvizaN24",
-        "link": "#",
+        "link": "https://youtube.com/@parvizan24?si=pKY0eY1-DXOvAiUz",
         "button": "Subscribe",
         "accent": "#ff0000",
-        "description": "Content coming soon.",
-        "points": [],
+        "description": "My life via videos, umlike other Instagram, here will be full videos that I will try to ",
+        "points": [
+            "Vlog videos",
+            "Maybe some kind of advices",
+            "some cool stuff (:"
+        ],
         "note": ""
     },
     "soft_4": {
@@ -44,11 +52,29 @@
         "icon": "icons/Social_media_logos/logo-white.png",
         "type": "Social",
         "handle": "@ParvizaN24",
-        "link": "#",
+        "link": "https://x.com/Parviz01_12",
         "button": "Follow",
         "accent": "#ffffff",
-        "description": "Content coming soon.",
+        "description": "Here I write posts with my thoughts, what I think about our days, what I worry about. Maybe even attach some kind of photos.",
+        "points": [
+            "Posts",
+            "My thoughts",
+            "This site updates :)"
+        ],
+        "note": [
+            "Yes, I will write about updates only in X", 
+            "why ? I don't know (:"]
+    },
+    "soft_5":{
+        "soft_name": "Gmail",
+        "icon": "icons/Social_media_logos/Gmail_Logo.svg",
+        "type": "Mail",
+        "handle": "mailto:your.email@gmail.com",
+        "link": "",
+        "button": "Write",
+        "accent": "#34A853",
+        "description": "Mail if you want in an official way ¯⁠\\_(⁠ツ⁠)_/⁠¯.",
         "points": [],
-        "note": ""
+        "note":""
     }
 }
