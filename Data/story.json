@@ -35,5 +35,49 @@
         "quotes": {
             "quote_1": "Don't laugh, it is true, that girl's aura still is too powerfull."
         }
+    },
+    "section_2": {
+        "topic": "21st September 2023",
+        "period": "21.09.23",
+        "layout": "auto",
+        "content": 
+            [
+            "Ok, so that was day when I first started to interest in something not technically. Psychollogy",
+            "[photo_1]",
+            "Well, still I think that this science is hardly depenceive on time, rather than physics, math and IT, that depend on system and sizes rather than present, past and future. I mean that, today it is common to have one style of psychological profile because we use phones and technology, when in the past, people had other psychological profile because let's say they hunt animals to survive. while phycis... Anyway :)",
+            "Psychology is still cool, and if I had enough time, I would study it...",
+            "Back to that day, that day I first find out about thing called temperaments.",
+            "There are four main temperaments: Sanguine, Phlegmatic, Choleric, Melancholic. And I will write what I understand that day. I will not write what they are, because I am not sure whether I understand correctly, and for learning purpose I insist you to ckeck out more educational sources :)",
+            "[photo_2]",
+            "Sanguine: the one guy that is talkative, well-going, optimistic... Like the one who is always in good mood and acts in a very supportive way",
+            "Choleric: this one is like Sanguine, but has one different aspect. He is kinda more responsive in emotional way. I am not saying that he is more emotional, everyone is emotional, and measuring it is calculation operation, not observation...   Back to Choleric, I said that he is more responsive to events, I mean that they tend to show that they are against or for your ideas, actions because of their emotions, (not because their analyse lead them to this. IT IS JUST MY UNDERSTANDING, I KNOW I MIGHT BE WRONG, BUT COME ON IT IS PSYCHOLOGY",
+            "[photo_3]",
+            "Phlegmatic: Chil guy. Well, he is one of those who always calm and stable, who able to stay normal even under crazy conditions, because he does not want to show hes emotions (not because, this is strange, but because: why? problem will not solve itself if you show your emotions...",
+            "Melancholic: Last one :) Well, (if you, i hope, not against, i will use she instead of he, to describe this type, because in my life most girls were melancholic (i know that this is strage reason)), so she is the only type that spends queite lots of her time thinking about something interesting more related to phylosofy and emotions rather than numbers, statistics and so on. She is quite interesting to talk, because if she opens up to talk with you, and really talks to you, you will feel that you need just to listen, because there is nothing to argue, maximum you can ask...",
+            "By the way, they like reading books ¯⁠⁠¯⁠¯\\_(⁠ツ⁠)_/⁠¯⁠¯⁠¯",
+            "[photo_4]",
+            "And, I don't know which is my temperaments, reason that i cross with all of them... Althoug there are much more inner temperaments, like hybrid of melancholic and choleric ...  Maybe there is one describing me..."
+            ],
+        "photos":{
+            "photo_1":{
+                "src":"Data/story_photos/oloy_1.jpg",
+                "caption":"Just photos from location, where I was that day"
+            },
+            "photo_2":{
+                "src":"Data/story_photos/oloy_2.jpg",
+                "caption":"That day weather were a bit different from photos' weather" 
+            },
+            "photo_3":{
+                "src":"Data/story_photos/oloy_3.jpg",
+                "caption":"Just one beautiful place..."
+            },
+            "photo_4":{
+                "src":"Data/story_photos/oloy_4.jpg",
+                "caption":"just to remember that day"
+            }
+        },
+        "quotes":{
+            "quote_1":"That day I found out that: everything that happens, happens for you, not to you"
+        }
     }
 }
