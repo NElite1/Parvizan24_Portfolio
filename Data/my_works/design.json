@@ -5,8 +5,19 @@
         "name": "ParvizaN 24",
         "description": "One of my best work is my website. I started working on it 20.03.2026 and keep updating it :)",
         "fullDescription": "",
-        "customerReview": "",
+        "url": "https://parvizan24.com",
+        "displayUrl": "parvizan24.com",
         "fullReview": "",
         "skill": "Web Dev"
+    },{
+        "image": "../story_photos/congix.jpg",
+        "images":[],
+        "name": "Congix",
+        "description": "This is AI project that I developed as co-founder with Davron, my old freind, to help school students",
+        "fullDescription":"",
+        "url":"https://congix.uz",
+        "displayUrl":"congix.uz",
+        "fullReview":"",
+        "skill":"Web Dev"
     }
 ]

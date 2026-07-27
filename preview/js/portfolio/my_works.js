@@ -14,9 +14,14 @@ const MY_WORK_FIELDS = [
     ["my-work-image", "image"],
     ["my-work-name", "name"],
     ["my-work-description", "description"],
-    ["my-work-customer-review", "customerReview"],
+    ["my-work-url", "url"],
     ["my-work-skill", "skill"],
 ];
+
+// Shows the address the way people read it: no scheme, no trailing slash.
+function prettyUrl(value) {
+    return value.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
 
 function buildLinePanel(entries) {
     const panel = document.createElement("div");
@@ -30,7 +35,21 @@ function buildLinePanel(entries) {
         MY_WORK_FIELDS.forEach(([className, field]) => {
             const el = document.createElement("div");
             el.className = className;
-            el.textContent = entry[field] ?? "";
+
+            if (field === "url" && entry.url) {
+                // "displayUrl" is the wording shown to the reader; only the
+                // underlying "url" is ever opened.
+                const link = document.createElement("a");
+                link.className = "my-work-url-link";
+                link.href = entry.url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = entry.displayUrl || prettyUrl(entry.url);
+                el.appendChild(link);
+            } else {
+                el.textContent = entry[field] ?? "";
+            }
+
             line.appendChild(el);
         });
 

@@ -47,10 +47,17 @@
         // back to the short "description" above.
         "fullDescription": "The full story: what it is, what you built, the tools, the result. As long as you want.",
 
-        // SHORT review - shown on the line/grid list. Leave "" if none.
-        "customerReview": "\"Loved it!\" - Client",
+        // Live web address of the work - shown on the line list (in the column
+        // the review used to sit in) and as a link in the overlay. It opens in
+        // a new tab; leave "" when the work has no public page.
+        "url": "https://example.com",
 
-        // LONG review - shown in the overlay. Falls back to "customerReview".
+        // The wording of that link - the text you click to open "url". Leave
+        // "" (or drop the field) to show the address itself, tidied up
+        // ("https://example.com/" renders as "example.com").
+        "displayUrl": "Visit the site",
+
+        // Customer review - shown ONLY in the overlay. Leave "" if none.
         "fullReview": "The complete client testimonial, quoted in full.",
 
         // Skill tag shown on the list and in the overlay.

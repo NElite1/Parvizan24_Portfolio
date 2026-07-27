@@ -208,7 +208,7 @@
     border-radius:15px;
     padding-left:5px;
 }
-.my-work-customer-review{
+.my-work-url{
     display:flex;
     flex-direction:row;
     align-items:center;
@@ -218,6 +218,18 @@
     background-color:var(--layer0);
     border-radius:15px;
      padding-left:5px;
+}
+.my-work-url-link{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    color:var(--main-color);
+    text-decoration:none;
+}
+.my-work-url-link:hover{
+    text-decoration:underline;
 }
 .my-work-skill{
     display:flex;

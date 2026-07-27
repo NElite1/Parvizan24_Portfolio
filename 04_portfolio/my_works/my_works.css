@@ -245,7 +245,7 @@
     border-radius:15px;
     padding-left:5px;
 }
-.my-work-customer-review{
+.my-work-url{
     display:flex;
     flex-direction:row;
     align-items:center;
@@ -254,6 +254,18 @@
     width:36.5%;
     border-radius:15px;
      padding-left:5px;
+}
+.my-work-url-link{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    color:var(--main-color);
+    text-decoration:none;
+}
+.my-work-url-link:hover{
+    text-decoration:underline;
 }
 .my-work-skill{
     display:flex;
@@ -429,6 +441,20 @@
     line-height:1.6;
     opacity:.85;
 }
+.work-detail-url{
+    align-self:flex-start;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    color:var(--main-color);
+    text-decoration:none;
+    font-weight:600;
+}
+.work-detail-url:hover{
+    text-decoration:underline;
+}
 .work-detail-review{
     margin:0;
     padding:6px 0 6px 20px;
@@ -527,7 +553,7 @@
         height:56px;
     }
     .my-work-description,
-    .my-work-customer-review{
+    .my-work-url{
         display:none;
     }
 

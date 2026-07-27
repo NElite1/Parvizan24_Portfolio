@@ -19,7 +19,7 @@ const MY_WORK_FIELDS = [
     ["my-work-image", "image"],
     ["my-work-name", "name"],
     ["my-work-description", "description"],
-    ["my-work-customer-review", "customerReview"],
+    ["my-work-url", "url"],
     ["my-work-skill", "skill"],
 ];
 
@@ -61,6 +61,35 @@ function fillImageCell(cell, value) {
     } else {
         cell.textContent = value ?? "";
     }
+}
+
+// Fills the address cell with a real link that opens in a new tab. The click
+// is kept to itself so following the link doesn't also open the detail
+// overlay behind it. An empty url just leaves the cell blank.
+function fillUrlCell(cell, entry) {
+    if (!entry.url) return;
+
+    cell.appendChild(buildUrlLink(entry, "my-work-url-link", true));
+}
+
+// The clickable address: "displayUrl" is the wording shown to the reader
+// ("Visit the site", the project's name, anything), and only the underlying
+// "url" is ever opened. Without it the address itself is shown, tidied up.
+function buildUrlLink(entry, className, stopClick = false) {
+    const link = document.createElement("a");
+    link.className = className;
+    link.href = entry.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = entry.displayUrl || prettyUrl(entry.url);
+    if (stopClick) link.addEventListener("click", e => e.stopPropagation());
+
+    return link;
+}
+
+// Shows the address the way people read it: no scheme, no trailing slash.
+function prettyUrl(value) {
+    return value.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
 function buildPanel(entries, extraClass, buildItem) {
@@ -129,11 +158,14 @@ function openWorkDetail(entry) {
         overlay.appendChild(desc);
     }
 
-    const reviewText = entry.fullReview || entry.customerReview;
-    if (reviewText) {
+    if (entry.url) overlay.appendChild(buildUrlLink(entry, "work-detail-url"));
+
+    // The customer review lives only here, in the overlay - the list shows the
+    // work's address in its place.
+    if (entry.fullReview) {
         const review = document.createElement("blockquote");
         review.className = "work-detail-review";
-        review.textContent = reviewText;
+        review.textContent = entry.fullReview;
         overlay.appendChild(review);
     }
 
@@ -161,6 +193,7 @@ function buildLinePanel(entries) {
             const el = document.createElement("div");
             el.className = className;
             if (field === "image") fillImageCell(el, entry.image);
+            else if (field === "url") fillUrlCell(el, entry);
             else el.textContent = entry[field] ?? "";
             line.appendChild(el);
         });
