@@ -23,18 +23,23 @@
     {
         // Thumbnail shown on the line/grid list.
         //   - A URL or path (contains "/" or ".") renders as a real image
-        //     that fills its frame, e.g. "profile_photos/site.png"
+        //     that fills its frame, e.g. "../work_photos/site.png"
         //   - Plain text (no "/" or ".") just shows as text - handy as a
         //     placeholder while you don't have an image yet.
-        "image": "profile_photos/example.png",
+        //
+        //   PATHS ARE RELATIVE TO THIS FOLDER (Data/my_works/), so a photo
+        //   sitting in Data/work_photos/ is "../work_photos/name.jpg". Full
+        //   "https://..." addresses work too.
+        "image": "../work_photos/example.png",
 
         // Gallery shown INSIDE the detail overlay (opens on click).
-        // Put as many URLs as you like - each renders as its own image.
+        // Put as many paths as you like - each renders as its own image,
+        // same path rules as "image" above.
         // Leave it as [] to fall back to the single "image" above.
         "images": [
-            "profile_photos/shot-1.png",
-            "profile_photos/shot-2.png",
-            "profile_photos/shot-3.png"
+            "../work_photos/shot-1.png",
+            "../work_photos/shot-2.png",
+            "../work_photos/shot-3.png"
         ],
 
         // Title of the work.

@@ -45,6 +45,20 @@ function isImagePath(value) {
     return typeof value === "string" && /[./]/.test(value);
 }
 
+// Photo paths inside a works file are written relative to THAT FILE - which is
+// how "../work_photos/congix.jpg" reads sitting in Data/my_works/. A bare src,
+// though, is resolved by the browser against the *page*, so the same entry
+// would point somewhere else on the live site than on a preview page and 404.
+// Rebasing them once, at load time, makes the JSON mean what it looks like it
+// means from wherever it's loaded.
+function resolveAsset(value, file) {
+    if (!isImagePath(value)) return value; // plain-text placeholder, leave it be
+    if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith("//") || value.startsWith("/")) {
+        return value; // already absolute (http:, data:, site root, ...)
+    }
+    return new URL(value, new URL(file, window.location.href)).href;
+}
+
 // Fills a thumbnail cell: a real <img> that fills the frame when the value is
 // a path/URL, otherwise the raw text. Falls back to text if the image 404s.
 function fillImageCell(cell, value) {
@@ -389,10 +403,17 @@ async function loadWorksData() {
     // that tab has no works yet - it shows the empty state instead of failing.
     if (!worksDataPromise) {
         worksDataPromise = Promise.all(
-            Object.entries(WORKS_FILES).map(([type, url]) =>
-                fetch(url)
+            Object.entries(WORKS_FILES).map(([type, file]) =>
+                fetch(file)
                     .then(response => response.json())
-                    .then(list => (Array.isArray(list) ? list : []).map(entry => ({ ...entry, type })))
+                    .then(list => (Array.isArray(list) ? list : []).map(entry => ({
+                        ...entry,
+                        type,
+                        image: resolveAsset(entry.image, file),
+                        images: Array.isArray(entry.images)
+                            ? entry.images.map(src => resolveAsset(src, file))
+                            : entry.images,
+                    })))
                     .catch(() => [])
             )
         ).then(results => results.flat());

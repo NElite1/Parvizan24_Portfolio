@@ -235,13 +235,17 @@
     border-radius:15px;
      padding-left:5px;
 }
+/* The description takes whatever the fixed-width cells leave over, so the
+   short address column doesn't eat half the row. min-width:0 lets it shrink
+   past its text instead of pushing the line wider. */
 .my-work-description{
     display:flex;
     flex-direction:row;
     align-items:center;
     justify-content:start;
     height:65px;
-    width:36.5%;
+    flex:1;
+    min-width:0;
     border-radius:15px;
     padding-left:5px;
 }
@@ -251,7 +255,8 @@
     align-items:center;
     justify-content:start;
     height:65px;
-    width:36.5%;
+    flex:0 0 200px;
+    width:200px;
     border-radius:15px;
      padding-left:5px;
 }
@@ -261,8 +266,14 @@
     text-overflow:ellipsis;
     white-space:nowrap;
 
-    color:var(--main-color);
     text-decoration:none;
+}
+/* Classic link colours: dark blue until it's been opened, dark red after. */
+.my-work-url-link:link{
+    color:#00008b;
+}
+.my-work-url-link:visited{
+    color:#8b0000;
 }
 .my-work-url-link:hover{
     text-decoration:underline;
@@ -448,9 +459,14 @@
     text-overflow:ellipsis;
     white-space:nowrap;
 
-    color:var(--main-color);
     text-decoration:none;
     font-weight:600;
+}
+.work-detail-url:link{
+    color:#00008b;
+}
+.work-detail-url:visited{
+    color:#8b0000;
 }
 .work-detail-url:hover{
     text-decoration:underline;

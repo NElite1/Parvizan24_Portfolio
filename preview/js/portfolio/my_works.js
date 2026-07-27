@@ -23,6 +23,41 @@ function prettyUrl(value) {
     return value.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
+// A value counts as an image when it looks like a path/URL (has a "." or "/");
+// plain words like "image" stay as literal text (handy placeholders).
+function isImagePath(value) {
+    return typeof value === "string" && /[./]/.test(value);
+}
+
+// Photo paths in a works file are written relative to THAT FILE, but a bare
+// src is resolved by the browser against the page - which is a different
+// folder here than on the live site. Rebase them once, at load time.
+function resolveAsset(value, file) {
+    if (!isImagePath(value)) return value;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith("//") || value.startsWith("/")) {
+        return value;
+    }
+    return new URL(value, new URL(file, window.location.href)).href;
+}
+
+// Fills a thumbnail cell: a real <img> that fills the frame when the value is
+// a path/URL, otherwise the raw text. Falls back to text if the image 404s.
+function fillImageCell(cell, value) {
+    if (isImagePath(value)) {
+        cell.classList.add("has-image");
+        const img = document.createElement("img");
+        img.src = value;
+        img.alt = "";
+        img.addEventListener("error", () => {
+            cell.classList.remove("has-image");
+            cell.textContent = value;
+        });
+        cell.appendChild(img);
+    } else {
+        cell.textContent = value ?? "";
+    }
+}
+
 function buildLinePanel(entries) {
     const panel = document.createElement("div");
     panel.className = "my-work-panel";
@@ -36,7 +71,9 @@ function buildLinePanel(entries) {
             const el = document.createElement("div");
             el.className = className;
 
-            if (field === "url" && entry.url) {
+            if (field === "image") {
+                fillImageCell(el, entry.image);
+            } else if (field === "url" && entry.url) {
                 // "displayUrl" is the wording shown to the reader; only the
                 // underlying "url" is ever opened.
                 const link = document.createElement("a");
@@ -69,7 +106,7 @@ function buildGridPanel(entries) {
 
         const image = document.createElement("div");
         image.className = "grid-image";
-        image.textContent = entry.image ?? "";
+        fillImageCell(image, entry.image);
 
         const name = document.createElement("h2");
         name.className = "grid-name";
@@ -211,10 +248,17 @@ async function loadWorksData() {
     if (worksData.length > 0) return;
 
     const lists = await Promise.all(
-        Object.entries(WORKS_FILES).map(([type, url]) =>
-            fetch(url)
+        Object.entries(WORKS_FILES).map(([type, file]) =>
+            fetch(file)
                 .then(response => response.json())
-                .then(list => (Array.isArray(list) ? list : []).map(entry => ({ ...entry, type })))
+                .then(list => (Array.isArray(list) ? list : []).map(entry => ({
+                    ...entry,
+                    type,
+                    image: resolveAsset(entry.image, file),
+                    images: Array.isArray(entry.images)
+                        ? entry.images.map(src => resolveAsset(src, file))
+                        : entry.images,
+                })))
                 .catch(() => [])
         )
     );
