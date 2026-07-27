@@ -48,9 +48,12 @@ function fillImageCell(cell, value) {
         const img = document.createElement("img");
         img.src = value;
         img.alt = "";
+        // A photo that won't load leaves the frame empty - printing the path
+        // instead spills a long URL right across the row.
         img.addEventListener("error", () => {
+            console.warn(`my_works: photo not found - ${value}`);
             cell.classList.remove("has-image");
-            cell.textContent = value;
+            cell.replaceChildren();
         });
         cell.appendChild(img);
     } else {
@@ -249,7 +252,9 @@ async function loadWorksData() {
 
     const lists = await Promise.all(
         Object.entries(WORKS_FILES).map(([type, file]) =>
-            fetch(file)
+            // no-cache: revalidate every time, so an edited works file shows up
+            // instead of the browser's stale copy (304 when nothing changed).
+            fetch(file, { cache: "no-cache" })
                 .then(response => response.json())
                 .then(list => (Array.isArray(list) ? list : []).map(entry => ({
                     ...entry,

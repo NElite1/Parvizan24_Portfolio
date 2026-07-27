@@ -221,7 +221,11 @@
     align-items:center;
     justify-content:start;
     height:65px;
+    flex:0 0 4.5%;
     width:4.5%;
+    /* Whatever ends up in here - photo or placeholder text - stays inside its
+       own cell instead of running across the neighbouring columns. */
+    overflow:hidden;
     border-radius:15px;
     padding-left:5px;
 }
@@ -260,23 +264,38 @@
     border-radius:15px;
      padding-left:5px;
 }
+/* The address reads as a chip rather than a coloured word: white text (so it
+   stays legible on the dark row) inside a bordered pill that carries the
+   colour. Green while unvisited, the site's purple once it's been opened -
+   :visited only allows colour properties, which is all this needs. */
 .my-work-url-link{
     max-width:100%;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
 
+    padding:7px 14px;
+    border:1px solid #00A85C;
+    border-radius:999px;
+    background-color:#07301F;
+
+    color:#fff;
+    font-size:14px;
     text-decoration:none;
-}
-/* Classic link colours: dark blue until it's been opened, dark red after. */
-.my-work-url-link:link{
-    color:#00008b;
+
+    transition:background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 .my-work-url-link:visited{
-    color:#8b0000;
+    border-color:#A06BEE;
+    background-color:#2A0B45;
+    color:#fff;
 }
 .my-work-url-link:hover{
-    text-decoration:underline;
+    background-color:#0A4A2F;
+    box-shadow:0 0 14px -4px #00A85C;
+}
+.my-work-url-link:visited:hover{
+    background-color:#3D1063;
 }
 .my-work-skill{
     display:flex;
@@ -452,6 +471,7 @@
     line-height:1.6;
     opacity:.85;
 }
+/* Same chip as the list, a size up for the overlay. */
 .work-detail-url{
     align-self:flex-start;
     max-width:100%;
@@ -459,17 +479,28 @@
     text-overflow:ellipsis;
     white-space:nowrap;
 
-    text-decoration:none;
+    padding:8px 18px;
+    border:1px solid #00A85C;
+    border-radius:999px;
+    background-color:#07301F;
+
+    color:#fff;
     font-weight:600;
-}
-.work-detail-url:link{
-    color:#00008b;
+    text-decoration:none;
+
+    transition:background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 .work-detail-url:visited{
-    color:#8b0000;
+    border-color:#A06BEE;
+    background-color:#2A0B45;
+    color:#fff;
 }
 .work-detail-url:hover{
-    text-decoration:underline;
+    background-color:#0A4A2F;
+    box-shadow:0 0 16px -4px #00A85C;
+}
+.work-detail-url:visited:hover{
+    background-color:#3D1063;
 }
 .work-detail-review{
     margin:0;

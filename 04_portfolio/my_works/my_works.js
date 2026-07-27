@@ -67,9 +67,13 @@ function fillImageCell(cell, value) {
         const img = document.createElement("img");
         img.src = value;
         img.alt = "";
+        // A photo that won't load leaves the frame empty - printing the path
+        // instead spills a long URL right across the row. The address is still
+        // in the console as a failed request, which is where you'd look anyway.
         img.addEventListener("error", () => {
+            console.warn(`my_works: photo not found - ${value}`);
             cell.classList.remove("has-image");
-            cell.textContent = value;
+            cell.replaceChildren();
         });
         cell.appendChild(img);
     } else {
@@ -404,7 +408,12 @@ async function loadWorksData() {
     if (!worksDataPromise) {
         worksDataPromise = Promise.all(
             Object.entries(WORKS_FILES).map(([type, file]) =>
-                fetch(file)
+                // no-cache: revalidate with the server every time. These files
+                // change whenever a work is added or a photo path is fixed, and
+                // a browser holding an old copy shows stale works (or hunts for
+                // a photo at a path that was already corrected). It's a 304 when
+                // nothing changed, so the cost is one round trip.
+                fetch(file, { cache: "no-cache" })
                     .then(response => response.json())
                     .then(list => (Array.isArray(list) ? list : []).map(entry => ({
                         ...entry,
