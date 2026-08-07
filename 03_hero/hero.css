@@ -17,7 +17,15 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, var(--main-color), var(--layer0));
+  /* The portrait is a black-and-green outfit on a transparent cutout, so the
+     old straight main-color -> black fade put dark green fabric on dark green
+     ground. Keep the green as a top band only and reach near-black well above
+     the middle, where the body actually sits. */
+  background: linear-gradient(to bottom,
+    var(--main-color) 0%,
+    #012d19 16%,
+    #00160c 38%,
+    var(--layer0) 68%);
   z-index: -1;
   pointer-events: none;
 }
@@ -48,9 +56,39 @@
   position: relative;
   z-index: 1;
 }
+/* Spotlight behind the cutout: the black trousers and shoes would otherwise be
+   black-on-black at the bottom of the gradient. Stays inside #hero-photo's own
+   stacking context, so z-index:-1 sits under the photo but still above the
+   section gradient. */
+#hero-photo::before{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:118%;
+  height:104%;
+  background:radial-gradient(ellipse at 50% 58%,
+    rgba(255,255,255,0.08) 0%,
+    rgba(0,110,62,0.10) 34%,
+    rgba(0,66,37,0.05) 55%,
+    transparent 72%);
+  z-index:-1;
+  pointer-events:none;
+}
 #hero-photo img{
   max-width:100%;
+  width:auto;
   height:auto;
+  max-height:80vh;      /* portrait cutout, don't let it outgrow the section */
+  align-self:center;    /* the column stretches its children otherwise */
+  object-fit:contain;
+  /* Thin light rim + green bloom: the edge stays readable even where the
+     silhouette matches the background behind it. */
+  filter:
+    drop-shadow(0 0 1.5px rgba(255,255,255,0.40))
+    drop-shadow(0 0 18px rgba(0,140,80,0.20))
+    drop-shadow(0 16px 28px rgba(0,0,0,0.55));
 }
 #arrow-to-down{
   position:absolute;
@@ -102,6 +140,11 @@
     height:auto;
     width:100%;
   }
+  #hero-photo img{
+    /* Stacked layout: the copy above already eats most of the screen, so cap
+       the portrait hard enough that it still lands above the fold. */
+    max-height:40vh;
+  }
   #arrow-to-down{
     bottom:18px;
     left:50%;
@@ -109,6 +152,57 @@
   }
   #arrow-to-down img{
     width:52px;
+  }
+}
+
+/* Short portrait phones (roughly 360x640 through iPhone SE): the copy alone is
+   ~350px of a ~550px screen, so the portrait was starting at the fold. Drop the
+   "three sections" list - the navbar links to all three anyway - and tighten the
+   spacing, which buys enough room for the whole figure above the fold. Every
+   taller phone keeps the full copy. */
+@media (max-width:900px) and (orientation:portrait) and (max-height:700px){
+  #hero{
+    padding:60px 24px 30px;
+    gap:16px;
+  }
+  #hero-content{
+    gap:10px;
+  }
+  #hero-intro{
+    display:none;
+  }
+  #hero-photo img{
+    max-height:45vh;
+  }
+}
+
+/* Landscape phone: width to spare, no height at all. Stacking here pushed the
+   portrait entirely below the fold (it started ~100px past a 300px viewport),
+   so go back to two columns and let the photo use the full column height. */
+@media (max-width:900px) and (orientation:landscape) and (max-height:520px){
+  #hero{
+    flex-direction:row;
+    align-items:center;
+    gap:20px;
+    padding:70px 20px 30px;
+  }
+  #hero-content{
+    width:auto;
+    flex:0.55;
+    gap:10px;
+  }
+  #hero-photo{
+    width:auto;
+    flex:0.4;
+  }
+  #hero-photo img{
+    max-height:72vh;
+  }
+  #arrow-to-down{
+    bottom:6px;
+  }
+  #arrow-to-down img{
+    width:38px;
   }
 }
 
