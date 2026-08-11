@@ -90,6 +90,43 @@
     drop-shadow(0 0 18px rgba(0,140,80,0.20))
     drop-shadow(0 16px 28px rgba(0,0,0,0.55));
 }
+/* The dragon. Out of flow and parked by hero.js, which measures where the cat's
+   feet land in the portrait and lines her up with them - the portrait scales
+   with the viewport, so the height can't be written down here. Until that first
+   measurement she is invisible, otherwise she'd flash in the top-left corner. */
+#hero-dragon{
+  position:absolute;
+  left:0;
+  top:0;
+  /* 1.69:1 is the aspect of her cropped frame, so the box is exactly the dragon
+     and hero.js can treat the two as the same rectangle. */
+  width:230px;
+  height:136px;
+  z-index:1;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .4s ease;
+}
+/* Short desktop viewports (a 768px-tall laptop) leave barely a hundred pixels
+   between the last line of copy and the bottom of the section. Give her a
+   smaller frame there rather than letting hero.js decide she doesn't fit. */
+@media (min-width:901px) and (max-height:860px){
+  #hero-dragon{ width:186px; height:110px; }
+}
+@media (min-width:901px) and (max-height:790px){
+  #hero-dragon{ width:150px; height:89px; }
+}
+#hero-dragon.is-placed{
+  opacity:1;
+}
+/* Dark section behind her, same treatment the portrait gets: a faint bloom so
+   the white edge never sits flat on the background. */
+#hero-dragon svg{
+  filter:
+    drop-shadow(0 0 14px rgba(255,255,255,0.18))
+    drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+}
+
 #arrow-to-down{
   position:absolute;
   bottom:30px;
@@ -140,6 +177,15 @@
     height:auto;
     width:100%;
   }
+  /* Stacked: there is no cat-feet line to meet any more (the portrait is a whole
+     row below), so she goes back into the flow between the copy and the photo. */
+  #hero-dragon{
+    position:relative;
+    flex:0 0 auto;
+    width:186px;
+    height:110px;
+    align-self:center;
+  }
   #hero-photo img{
     /* Stacked layout: the copy above already eats most of the screen, so cap
        the portrait hard enough that it still lands above the fold. */
@@ -171,6 +217,10 @@
   #hero-intro{
     display:none;
   }
+  #hero-dragon{
+    width:142px;
+    height:84px;
+  }
   #hero-photo img{
     max-height:45vh;
   }
@@ -197,6 +247,11 @@
   }
   #hero-photo img{
     max-height:72vh;
+  }
+  /* Two columns again on a ~300px-tall viewport: a third one for her would take
+     the copy's room, and there is no vertical space to park her in either. */
+  #hero-dragon{
+    display:none;
   }
   #arrow-to-down{
     bottom:6px;
