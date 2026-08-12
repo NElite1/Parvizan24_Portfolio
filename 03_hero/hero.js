@@ -42,8 +42,11 @@ if (photo) {
    She stands under the copy, level with the cat's feet in the portrait. That
    line can't be a CSS number: the portrait is capped in vh and shrinks with the
    column, so the only way to hit it is to measure the rendered <img> and take
-   the fraction of it the paws sit at. Below 900px the hero stacks and the CSS
-   puts her back in the flow, so we clear whatever we wrote.
+   the fraction of it the paws sit at.
+
+   Desktop only. Below 1025px the hero is the tablet/phone layout it has always
+   been, and she is not mounted at all - hidden isn't enough, since the embed
+   keeps a requestAnimationFrame loop running for as long as it is mounted.
  * ------------------------------------------------------------------------- */
 
 /* Where the paws land in soul.png, as a fraction of the file's full height -
@@ -65,20 +68,33 @@ const hero = document.getElementById("hero");
 const heroContent = document.getElementById("hero-content");
 
 if (dragonBox && hero && heroContent && photo && window.Dragon) {
-  window.Dragon.mount(dragonBox, {
-    size: "100%",                 // her frame is the box; hero.css sizes both
-    dragon: "#ffffff",            // she is white, like the cat
-    edge: "#c3d1cb",              // just enough grey to keep wing and body apart
-    accent: "var(--main-color)",  // her eye
-    entrance: 1200,
-  });
+  const desktop = window.matchMedia("(min-width:1025px)");
+  let dragon = null;
 
-  const stacked = window.matchMedia("(max-width:900px)");
+  /* Mounted and destroyed as the window crosses the breakpoint, so a phone
+     never pays for her and a window dragged wide still gets her. */
+  const wake = () => {
+    if (dragon) return;
+    dragon = window.Dragon.mount(dragonBox, {
+      size: "100%",                 // her frame is the box; hero.css sizes both
+      dragon: "#ffffff",            // she is white, like the cat
+      edge: "#c3d1cb",              // just enough grey to keep wing and body apart
+      accent: "var(--main-color)",  // her eye
+      entrance: 1200,
+    });
+  };
+  const sleep = () => {
+    if (!dragon) return;
+    dragon.destroy();
+    dragon = null;
+    dragonBox.classList.remove("is-placed");
+    dragonBox.style.left = "";
+    dragonBox.style.top = "";
+  };
 
   /* #hero-content is a full-height centred column, so its own box reaches far
-     below the words in it. The last line is what she has to stay clear of, and
-     which child holds it moves (#hero-intro is dropped on short phones), so ask
-     the children rather than the column. */
+     below the words in it. The last line is what she has to stay clear of, so
+     ask the children where they actually end rather than the column. */
   const copyBottom = () => {
     let bottom = heroContent.getBoundingClientRect().top;
     for (const kid of heroContent.children) {
@@ -89,12 +105,9 @@ if (dragonBox && hero && heroContent && photo && window.Dragon) {
   };
 
   const place = () => {
-    if (stacked.matches) {
-      dragonBox.style.left = "";
-      dragonBox.style.top = "";
-      dragonBox.classList.add("is-placed");
-      return;
-    }
+    if (!desktop.matches) { sleep(); return; }
+    wake();
+
     const heroRect = hero.getBoundingClientRect();
     const photoRect = photo.getBoundingClientRect();
     const contentRect = heroContent.getBoundingClientRect();
