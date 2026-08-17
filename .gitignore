@@ -1,0 +1,9 @@
+# Design source material - not served by the site
+patterns/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*~
+.vscode/
+.idea/
