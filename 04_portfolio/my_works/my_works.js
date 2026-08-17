@@ -47,10 +47,10 @@ function isImagePath(value) {
 
 // Photo paths inside a works file are written relative to THAT FILE - which is
 // how "../work_photos/congix.jpg" reads sitting in Data/my_works/. A bare src,
-// though, is resolved by the browser against the *page*, so the same entry
-// would point somewhere else on the live site than on a preview page and 404.
-// Rebasing them once, at load time, makes the JSON mean what it looks like it
-// means from wherever it's loaded.
+// though, is resolved by the browser against the *page*, not the JSON, so the
+// same entry would point somewhere else and 404. Rebasing them once, at load
+// time, makes the JSON mean what it looks like it means from wherever it's
+// loaded.
 function resolveAsset(value, file) {
     if (!isImagePath(value)) return value; // plain-text placeholder, leave it be
     if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith("//") || value.startsWith("/")) {
@@ -635,8 +635,3 @@ export async function initMyWorks() {
     if (token !== initToken) return; // a newer initMyWorks() call has since taken over
     if (initialActive) showTab(initialActive.textContent, 0, true);
 }
-
-// Preview pages (e.g. my_works_preview.html) already have the markup present
-// at load time and don't go through portfolio.js's dynamic injection - so
-// self-init when that's the case.
-if (document.querySelector(".my-work")) initMyWorks();
