@@ -39,10 +39,14 @@
     <link rel="stylesheet" href="04_portfolio/skills/skills.css">
 
   <!--JS files-->
-    <!-- Classic script, so it has to come before the modules that use it:
+    <!-- The dragon is gitignored, so the file isn't in the repo and this tag
+         would 404. When she comes back, uncomment this line, the #hero-dragon
+         div below, and the block at the foot of 03_hero/hero.js.
+         Classic script, so it has to come before the modules that use it:
          deferred classic scripts and modules run in document order, which is
-         what leaves window.Dragon ready by the time hero.js mounts her. -->
+         what leaves window.Dragon ready by the time hero.js mounts her.
     <script src="dragon-embed.js" defer></script>
+    -->
     <script type="module" src="01_parvizan24/parvizan24.js"></script>
     <script type="module" src="02_navbar/navbar.js"></script>
     <script type="module" src="03_hero/hero.js"></script>
@@ -106,10 +110,12 @@
         If you have same aim, contact me, we will work as a team <span class="spacer"></span> =)
       </h2>
     </div>
-    <!-- Sits after the copy so the stacked (mobile) layout puts her under it
+    <!-- Dragon, parked along with dragon-embed.js (gitignored).
+         Sits after the copy so the stacked (mobile) layout puts her under it
          for free; on desktop hero.js lifts her out of flow and parks her at
-         the height of the cat's feet. -->
+         the height of the cat's feet.
     <div id="hero-dragon"></div>
+    -->
     <div id="hero-photo">
       <img id="hero-photo-img" src="profile_photos/soul.png" alt="Parviz">
     </div>

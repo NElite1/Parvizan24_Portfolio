@@ -21,11 +21,20 @@
      old straight main-color -> black fade put dark green fabric on dark green
      ground. Keep the green as a top band only and reach near-black well above
      the middle, where the body actually sits. */
+  /* Top three stops are unchanged - that's the fast dive to near-black by the
+     middle, where the body sits. What changed is the tail: it used to land on
+     var(--layer0) at 68% and stay flat, and that corner - a ramp that suddenly
+     stops moving - read as a hard horizontal line across the section. Now it
+     decays to black at 100% instead, in shrinking steps so there's no corner. */
   background: linear-gradient(to bottom,
     var(--main-color) 0%,
     #012d19 16%,
     #00160c 38%,
-    var(--layer0) 68%);
+    #000f08 50%,
+    #000a05 62%,
+    #000603 74%,
+    #000301 86%,
+    var(--layer0) 100%);
   z-index: -1;
   pointer-events: none;
 }
@@ -90,25 +99,38 @@
     drop-shadow(0 0 18px rgba(0,140,80,0.20))
     drop-shadow(0 16px 28px rgba(0,0,0,0.55));
 }
-/* The dragon. Desktop only - tablet and phone give the hero no room to spare, so
-   below 1025px she is gone entirely and the section is exactly what it was
-   before she existed. hero.js doesn't even mount her there. */
+/* --- The dragon: out of the repo, so these rules are parked --------------- *
+
+   dragon-embed.js is gitignored and #hero-dragon is commented out of
+   index.html, so nothing below has an element to style. Kept rather than
+   deleted: bringing her back is uncommenting this, the <div> and <script> in
+   index.html, and the block at the foot of hero.js.
+
+   CSS comments don't nest, so the notes that used to sit inside these rules
+   are written out as plain text here.
+
+   Desktop only - tablet and phone gave the hero no room to spare, so below
+   1025px she was gone entirely and the section was exactly what it was before
+   she existed. hero.js didn't even mount her there.
+
 #hero-dragon{
   display:none;
 }
 
 @media (min-width:1025px){
-  /* Out of flow and parked by hero.js, which measures where the cat's feet land
-     in the portrait and lines her up with them - the portrait scales with the
-     viewport, so the height can't be written down here. Until that first
-     measurement she is invisible, otherwise she'd flash in the top-left corner. */
+
+  Out of flow and parked by hero.js, which measures where the cat's feet land
+  in the portrait and lines her up with them - the portrait scales with the
+  viewport, so the height can't be written down here. Until that first
+  measurement she is invisible, otherwise she'd flash in the top-left corner.
+  1.69:1 is the aspect of her cropped frame, so the box is exactly the dragon
+  and hero.js can treat the two as the same rectangle.
+
   #hero-dragon{
     display:block;
     position:absolute;
     left:0;
     top:0;
-    /* 1.69:1 is the aspect of her cropped frame, so the box is exactly the
-       dragon and hero.js can treat the two as the same rectangle. */
     width:230px;
     height:136px;
     z-index:1;
@@ -119,23 +141,29 @@
   #hero-dragon.is-placed{
     opacity:1;
   }
-  /* Dark section behind her, same treatment the portrait gets: a faint bloom so
-     the white edge never sits flat on the background. */
+
+  Dark section behind her, same treatment the portrait gets: a faint bloom so
+  the white edge never sits flat on the background.
+
   #hero-dragon svg{
     filter:
       drop-shadow(0 0 14px rgba(255,255,255,0.18))
       drop-shadow(0 6px 18px rgba(0,0,0,0.45));
   }
 }
-/* Short desktop windows (a 768px-tall laptop) leave barely a hundred pixels
-   between the last line of copy and the bottom of the section. Give her a
-   smaller frame there rather than letting hero.js decide she doesn't fit. */
+
+Short desktop windows (a 768px-tall laptop) leave barely a hundred pixels
+between the last line of copy and the bottom of the section. She got a smaller
+frame there rather than letting hero.js decide she doesn't fit.
+
 @media (min-width:1025px) and (max-height:860px){
   #hero-dragon{ width:186px; height:110px; }
 }
 @media (min-width:1025px) and (max-height:790px){
   #hero-dragon{ width:150px; height:89px; }
 }
+
+ * ------------------------------------------------------------------------- */
 
 #arrow-to-down{
   position:absolute;
