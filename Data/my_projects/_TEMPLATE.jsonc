@@ -1,0 +1,67 @@
+// =====================================================================
+//  PROJECTS - how to add a project
+// =====================================================================
+//
+//  This file is a TEMPLATE ONLY. It is never loaded by the site (that is
+//  why it can have comments - real .json files cannot).
+//
+//  Real data lives in projects.json, next to this file: a JSON array
+//  [ ... ] of project objects. Copy the block below (WITHOUT these
+//  comments) into it, filling the values.
+//
+//  Each project gets the whole Projects panel to itself: its story on one
+//  side, a deck of its screens on the other. With more than one project
+//  in the file, a row of buttons appears above to switch between them, in
+//  the order they are written - the first one opens first.
+//
+//  PATHS ARE RELATIVE TO THIS FOLDER (Data/my_projects/), so a photo
+//  sitting in Data/work_photos/ is "../work_photos/name.jpg". Full
+//  "https://..." addresses work too.
+//
+// ---------------------------------------------------------------------
+
+[
+    {
+        // Title of the project - the big heading.
+        "name": "Project name",
+
+        // Small mark shown beside the title and on the switch button. Use a
+        // square image with a transparent background. Leave "" for none.
+        "logo": "../work_photos/example_mark.webp",
+
+        // One line under the title - the project's own slogan.
+        "tagline": "What it is, in one line.",
+
+        // A short paragraph: what it is and who it is for.
+        "description": "Two or three sentences about the project.",
+
+        // Label / value rows under the description. As many as you like;
+        // [] for none. Keep labels to a word or two.
+        "facts": [
+            { "label": "My part", "value": "What you did." },
+            { "label": "Inside", "value": "What it has." }
+        ],
+
+        // Live address - becomes the button under the facts. It opens in a
+        // new tab; leave "" when the project has no public page.
+        "url": "https://example.com",
+
+        // The address as the button shows it ("Visit example.com"). Leave ""
+        // to show the "url" itself, tidied up.
+        "displayUrl": "example.com",
+
+        // Colours of the soft glow turning behind the screens - take them
+        // from the project's own logo. Leave [] for the site's green/purple.
+        "colors": ["#004225", "#4A067D"],
+
+        // The deck of screens. The first one starts in front; the buttons
+        // under the deck (their text is "label") bring the others forward.
+        // Screenshots look best around 4:3 - wider or taller ones are
+        // cropped from the top. "alt" describes the picture for people who
+        // can't see it.
+        "shots": [
+            { "src": "../work_photos/shot-1.png", "label": "Home", "alt": "What the screenshot shows." },
+            { "src": "../work_photos/shot-2.png", "label": "Chat", "alt": "What the screenshot shows." }
+        ]
+    }
+]

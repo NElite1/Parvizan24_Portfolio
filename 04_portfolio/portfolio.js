@@ -1,11 +1,12 @@
 import { initMyWorks } from "./my_works/my_works.js";
+import { initProjects } from "./my_projects/my_projects.js";
 import { initSkills } from "./skills/skills.js";
 
 const portfolioContent = document.getElementById("portfolio-content");
 const portfolioLogo = document.getElementById('portfolio-websection-logo');
 
-// Each section's markup for #portfolio-active-content. My Works and Skills have
-// real builds; Projects stays an empty placeholder.
+// Each section's markup for #portfolio-active-content. My Works and Skills
+// carry their tab bars; Projects is one empty stage that my_projects.js fills.
 const ACTIVE_CONTENT = {
     myWorks: `
         <div id="portfolio-active-content-navbar">
@@ -26,13 +27,7 @@ const ACTIVE_CONTENT = {
         <div class="my-work"></div>
     `,
     projects: `
-        <div class="projects-soon">
-            <div class="projects-soon-orb"></div>
-            <h2 class="projects-soon-title">Something is brewing<span class="projects-soon-dots"><span>.</span><span>.</span><span>.</span></span></h2>
-            <p class="projects-soon-line">Still under development</p>
-            <p class="projects-soon-line">Deploying this <span class="projects-soon-highlight">August</span></p>
-            <p class="projects-soon-line">Then it starts helping you <span class="projects-soon-wink">:)</span></p>
-        </div>
+        <div class="projects-stage"></div>
     `,
     skills: `
         <div id="portfolio-active-content-navbar">
@@ -106,10 +101,17 @@ function makeSlide(name) {
     const slide = document.createElement("div");
     slide.className = "section-content";
     slide.innerHTML = ACTIVE_CONTENT[name] ?? "";
+
+    // Projects is built the moment its slide exists rather than after the
+    // slide lands: it works on its own slide only (no ids, nothing shared), so
+    // it can already be drawn while it scrolls into - or past - the view.
+    if (name === "projects") initProjects(slide);
+
     return slide;
 }
 
-// Only My Works and Skills have JS behind them; Projects is pure CSS.
+// My Works and Skills find their markup by id, so they can only be set up once
+// their slide is the only one left in the DOM. Projects is done in makeSlide.
 function initSection(name) {
     if (name === "myWorks") initMyWorks();
     if (name === "skills") initSkills();
@@ -166,8 +168,8 @@ function renderPortfolio(active) {
     // Build a strip stacking every section from lo..hi. The section we're
     // leaving keeps its live DOM (rendered lists, slider position, ...) by
     // being moved across; the rest are fresh markup. The only section that can
-    // ever sit between two others is Projects, which is static - so nothing
-    // data-driven is ever shown mid-slide without being initialised.
+    // ever sit between two others is Projects, which builds itself in makeSlide
+    // - so nothing is ever shown mid-slide without being initialised.
     const strip = document.createElement("div");
     strip.className = "section-strip";
 

@@ -42,6 +42,12 @@
             "../work_photos/shot-3.png"
         ],
 
+        // Pin: true keeps this work at the TOP of its tab, above everything
+        // that isn't pinned, wherever it sits in the file (several pinned
+        // works keep their file order among themselves). It also gets a small
+        // pin badge on its thumbnail. Leave it out for a normal entry.
+        "pinned": true,
+
         // Title of the work.
         "name": "Project name",
 

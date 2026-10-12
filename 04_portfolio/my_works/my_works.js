@@ -51,7 +51,7 @@ function isImagePath(value) {
 // same entry would point somewhere else and 404. Rebasing them once, at load
 // time, makes the JSON mean what it looks like it means from wherever it's
 // loaded.
-function resolveAsset(value, file) {
+export function resolveAsset(value, file) {
     if (!isImagePath(value)) return value; // plain-text placeholder, leave it be
     if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith("//") || value.startsWith("/")) {
         return value; // already absolute (http:, data:, site root, ...)
@@ -204,7 +204,7 @@ function closeWorkDetail() {
 function buildLinePanel(entries) {
     return buildPanel(entries, null, (entry, index) => {
         const line = document.createElement("div");
-        line.className = "line";
+        line.className = entry.pinned ? "line pinned" : "line";
         line.style.animationDelay = `${index * 60}ms`;
 
         MY_WORK_FIELDS.forEach(([className, field]) => {
@@ -224,7 +224,7 @@ function buildLinePanel(entries) {
 function buildGridPanel(entries) {
     return buildPanel(entries, "my-work-grid-panel", entry => {
         const card = document.createElement("div");
-        card.className = "grid";
+        card.className = entry.pinned ? "grid pinned" : "grid";
 
         const image = document.createElement("div");
         image.className = "grid-image";
@@ -423,6 +423,9 @@ async function loadWorksData() {
                             ? entry.images.map(src => resolveAsset(src, file))
                             : entry.images,
                     })))
+                    // Pinned works lead their tab. The sort is stable, so
+                    // everything else keeps the order it has in the file.
+                    .then(list => list.sort((a, b) => Boolean(b.pinned) - Boolean(a.pinned)))
                     .catch(() => [])
             )
         ).then(results => results.flat());

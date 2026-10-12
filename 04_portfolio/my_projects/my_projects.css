@@ -1,152 +1,428 @@
-/* Projects "coming soon" teaser ------------------------------------------- */
-.projects-soon{
+/* Projects: one project at a time, on its own stage ------------------------
+   Built by my_projects.js from Data/my_projects/projects.json. The stage is
+   its own container, so the layout answers to the size of the panel it sits
+   in (sidebar and all) rather than to the window: cqi/cqh below are 1% of the
+   stage's width/height. */
+.projects-stage{
     position:relative;
+    container-type:size;
 
     display:flex;
     flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:20px;
 
-    width:100%;
-    height:100%;
+    flex:1;
     min-height:0;
+    overflow:hidden auto;
 
-    text-align:center;
+    border-radius:20px;
+    background-color:#08070d;
+
+    color:var(--text);
+    font-family:Inter, sans-serif;
+}
+.projects-stage ::selection{
+    background-color:rgba(160,107,238,.45);
+    color:#fff;
+}
+.projects-stage :focus-visible{
+    outline:2px solid #A06BEE;
+    outline-offset:3px;
+}
+
+.projects-empty{
+    margin:auto;
+    padding:20px;
+    font-size:1.1rem;
+    color:rgba(255,255,255,.6);
+}
+
+/* Story on the left, screens on the right. */
+.project{
+    position:relative;
+    flex:1 0 auto;
+
+    display:grid;
+    grid-template-columns:minmax(0, 5fr) minmax(0, 7fr);
+    align-items:center;
+    gap:clamp(24px, 4.5cqi, 64px);
+
+    box-sizing:border-box;
+    padding:clamp(18px, 4.5cqh, 54px) clamp(22px, 4cqi, 54px);
     overflow:hidden;
 }
 
-/* Pulsing orb - the mysterious "something" glowing in the dark. */
-.projects-soon-orb{
-    width:170px;
-    height:170px;
+/* The project's own colours, turning slowly behind its screens. */
+.project-glow{
+    position:absolute;
+    top:50%;
+    right:-14%;
+
+    width:min(74%, 900px);
+    aspect-ratio:1;
     border-radius:50%;
 
-    background:radial-gradient(circle at 50% 40%, var(--main-color), transparent 70%);
+    background:var(--project-glow);
+    filter:blur(90px);
+    opacity:.2;
+    translate:0 -50%;
 
-    filter:blur(5px);
-    opacity:.9;
-    margin-bottom:14px;
-
-    animation:projects-orb-pulse 3.5s ease-in-out infinite;
+    pointer-events:none;
+    animation:project-glow-turn 90s linear infinite;
 }
-@keyframes projects-orb-pulse{
-    0%,100%{
-        transform:scale(1);
-        opacity:.55;
-    }
-    50%{
-        transform:scale(1.18);
-        opacity:1;
-    }
+@keyframes project-glow-turn{
+    to{ rotate:360deg; }
 }
 
-.projects-soon-title{
+/* Story -------------------------------------------------------------------- */
+.project-copy{
+    position:relative;
+    min-width:0;
+}
+.project-title{
+    display:flex;
+    align-items:center;
+    gap:.28em;
+
     margin:0;
-    font-size:42px;
+    font-size:clamp(2.2rem, 5.2cqi, 4.25rem);
     font-weight:700;
-    letter-spacing:.5px;
-
-    opacity:0;
-    animation:projects-fade-up .6s ease both;
-    animation-delay:.1s;
+    line-height:1;
+    letter-spacing:-0.04em;
+}
+.project-mark{
+    flex:none;
+    width:1.08em;
+    height:1.08em;
+}
+.project-tagline{
+    margin:clamp(13px, 2.6cqh, 20px) 0 0;
+    font-size:clamp(1.05rem, 1.75cqi, 1.35rem);
+    font-weight:500;
+    line-height:1.3;
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+}
+.project-description{
+    margin:14px 0 0;
+    max-width:46ch;
+    font-size:1rem;
+    line-height:1.6;
+    color:rgba(255,255,255,.74);
+    text-wrap:pretty;
 }
 
-/* Animated trailing dots after the title. */
-.projects-soon-dots span{
-    opacity:0;
-    animation:projects-dot-blink 1.4s infinite;
+.project-facts{
+    margin:clamp(18px, 4cqh, 30px) 0 0;
+    max-width:46ch;
 }
-.projects-soon-dots span:nth-child(1){ animation-delay:0s; }
-.projects-soon-dots span:nth-child(2){ animation-delay:.2s; }
-.projects-soon-dots span:nth-child(3){ animation-delay:.4s; }
-@keyframes projects-dot-blink{
-    0%,60%,100%{ opacity:0; }
-    30%{ opacity:1; }
-}
+.project-fact{
+    display:grid;
+    grid-template-columns:5.5em minmax(0, 1fr);
+    gap:16px;
 
-.projects-soon-line{
+    padding:clamp(7px, 1.5cqh, 11px) 0;
+    border-top:1px solid rgba(255,255,255,.1);
+
+    font-size:.94rem;
+    line-height:1.45;
+}
+.project-fact:last-child{
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+.project-fact dt{
+    color:rgba(255,255,255,.6);
+}
+.project-fact dd{
     margin:0;
-    font-size:23px;
+}
+
+/* Same green chip the works use for an address, grown into a button. */
+.project-link{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    margin-top:clamp(18px, 4cqh, 30px);
+    padding:12px 20px 12px 22px;
+    border:1px solid #00A85C;
+    border-radius:999px;
+    background-color:#07301F;
+
+    color:#fff;
+    font-size:.98rem;
+    font-weight:600;
+    text-decoration:none;
+
+    transition:background-color .2s ease, box-shadow .2s ease;
+}
+.project-link:hover{
+    background-color:#0A4A2F;
+    box-shadow:0 10px 24px -10px #00A85C;
+}
+.project-link-arrow{
+    width:18px;
+    height:18px;
+    transition:translate .3s cubic-bezier(.16, 1, .3, 1);
+}
+.project-link:hover .project-link-arrow{
+    translate:3px -3px;
+}
+
+/* Screens ------------------------------------------------------------------- */
+/* The column measures the room it has, so the deck can be as large as fits
+   both ways: inside it, cqw/cqh are this column's own width and height, and
+   56px of the height is kept for the buttons under the deck. */
+.project-show{
+    position:relative;
+    align-self:stretch;
+    container-type:size;
+
+    display:grid;
+    align-content:center;
+    justify-items:center;
+    gap:18px;
+
+    min-width:0;
+    min-height:0;
+
+    perspective:1400px;
+}
+.project-show[hidden],
+.project-shot-tabs[hidden]{
+    display:none;
+}
+.project-deck{
+    position:relative;
+    width:min(94cqw, (100cqh - 56px) * 1.3245);
+    aspect-ratio:1000 / 755;
+
+    transform-style:preserve-3d;
+    /* --lean-x/y: where the pointer is over the stage, -1..1 (my_projects.js). */
+    transform:
+        rotateY(calc(-9deg + var(--lean-x, 0) * 5deg))
+        rotateX(calc(3deg - var(--lean-y, 0) * 4deg));
+    transition:transform .7s cubic-bezier(.16, 1, .3, 1);
+}
+
+/* Every screen is the same 4:3 frame pinned to the deck's bottom-left; its
+   place in the stack (data-pos, 0 = in front) only moves it up, right and
+   back. The percentages are of the frame itself: one step is 9% of the deck
+   across and 7% up. */
+.project-shot{
+    position:absolute;
+    left:0;
+    bottom:0;
+
+    width:82%;
+    aspect-ratio:4 / 3;
+    box-sizing:border-box;
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    background-color:#0b0a12;
+    box-shadow:0 28px 50px -18px rgba(0,0,0,.85);
+
+    /* Anything further back than the third screen waits out of sight. */
+    translate:21.95% -22.76% -140px;
     opacity:0;
-    color:rgba(255,255,255,.72);
-    animation:projects-fade-up .6s ease both;
-}
-.projects-soon-line:nth-of-type(1){ animation-delay:.3s; }
-.projects-soon-line:nth-of-type(2){ animation-delay:.5s; }
-.projects-soon-line:nth-of-type(3){ animation-delay:.7s; }
+    pointer-events:none;
 
-/* Shimmering "August". */
-.projects-soon-highlight{
-    font-weight:700;
-    background:linear-gradient(100deg,
-        var(--main-color) 0%,
-        #fff 45%,
-        var(--main-color) 90%);
-    background-size:200% auto;
-
-    -webkit-background-clip:text;
-    background-clip:text;
-    -webkit-text-fill-color:transparent;
-    color:transparent;
-
-    animation:projects-shimmer 3s linear infinite;
+    cursor:pointer;
+    transition:
+        translate .8s cubic-bezier(.16, 1, .3, 1),
+        opacity .5s ease;
 }
-@keyframes projects-shimmer{
-    to{ background-position:200% center; }
+.project-shot img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:top center;
+}
+/* The further back, the deeper in shadow. */
+.project-shot::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-color:#06050b;
+    opacity:0;
+    transition:opacity .6s ease;
+    pointer-events:none;
+}
+.project-shot[data-pos="0"]{
+    translate:0 0 0;
+    opacity:1;
+    pointer-events:auto;
+    z-index:3;
+}
+.project-shot[data-pos="1"]{
+    translate:10.98% -11.38% -70px;
+    opacity:1;
+    pointer-events:auto;
+    z-index:2;
+}
+.project-shot[data-pos="2"]{
+    opacity:1;
+    pointer-events:auto;
+    z-index:1;
+}
+.project-shot[data-pos="1"]::after{ opacity:.5; }
+.project-shot[data-pos="2"]::after{ opacity:.72; }
+.project-shot[data-pos="1"]:hover::after{ opacity:.28; }
+.project-shot[data-pos="2"]:hover::after{ opacity:.5; }
+
+.project-shot-tabs{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:6px;
+}
+.project-shot-tab,
+.project-switch-item{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    min-height:38px;
+    padding:0 16px;
+    border:1px solid transparent;
+    border-radius:999px;
+    background:none;
+
+    color:rgba(255,255,255,.66);
+    font:500 .9rem/1 Inter, sans-serif;
+
+    cursor:pointer;
+    transition:color .2s ease, background-color .2s ease;
+}
+.project-shot-tab:hover,
+.project-switch-item:hover{
+    color:#fff;
+}
+/* Selected: the same raised pill as the tab bars of the other sections. */
+.project-shot-tab[aria-selected="true"],
+.project-switch-item[aria-pressed="true"]{
+    border-color:rgba(255,255,255,.06);
+    background-color:#252525;
+    color:#fff;
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-.projects-soon-wink{
-    display:inline-block;
-    color:var(--main-color);
-    animation:projects-wink 4s ease-in-out infinite;
+/* Switch between projects - only there when the file holds more than one.
+   It lies over the top of the project (which makes room for it) rather than
+   above it, so the glow runs behind the buttons instead of stopping short. */
+.project-switch{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    z-index:2;
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+
+    padding:14px clamp(14px, 3cqi, 40px) 0;
 }
-@keyframes projects-wink{
-    0%,92%,100%{ transform:rotate(0); }
-    96%{ transform:rotate(-12deg) scale(1.15); }
+.project-switch + .project{
+    padding-top:calc(clamp(18px, 4.5cqh, 54px) + 40px);
+}
+.project-switch-item img{
+    width:20px;
+    height:20px;
 }
 
-@keyframes projects-fade-up{
+/* Arrival: the screens rise into their places from the front one out, the
+   story follows line by line. `backwards` only - once it has played, the deck
+   goes back to plain transitions. */
+.project.is-entering .project-shot{
+    animation:project-shot-in .9s cubic-bezier(.16, 1, .3, 1) backwards;
+}
+.project.is-entering .project-shot[data-pos="1"]{ animation-delay:.09s; }
+.project.is-entering .project-shot[data-pos="2"]{ animation-delay:.18s; }
+@keyframes project-shot-in{
     from{
+        translate:0 12% 0;
         opacity:0;
-        transform:translateY(12px);
     }
-    to{
-        opacity:1;
-        transform:translateY(0);
+}
+.project.is-entering .project-copy > *{
+    animation:project-copy-in .7s cubic-bezier(.16, 1, .3, 1) backwards;
+}
+.project.is-entering .project-copy > :nth-child(2){ animation-delay:.06s; }
+.project.is-entering .project-copy > :nth-child(3){ animation-delay:.12s; }
+.project.is-entering .project-copy > :nth-child(4){ animation-delay:.18s; }
+.project.is-entering .project-copy > :nth-child(5){ animation-delay:.24s; }
+@keyframes project-copy-in{
+    from{
+        translate:0 14px;
+        opacity:0;
     }
 }
 
-/* Tablet ------------------------------------------------------------------- */
-@media (max-width:1024px){
-    .projects-soon-orb{
-        width:130px;
-        height:130px;
+@media (prefers-reduced-motion:reduce){
+    .project-glow,
+    .project.is-entering .project-shot,
+    .project.is-entering .project-copy > *{
+        animation:none;
     }
-    .projects-soon-title{
-        font-size:32px;
-    }
-    .projects-soon-line{
-        font-size:19px;
+    .project-shot,
+    .project-deck,
+    .project-link-arrow{
+        transition-duration:.01s;
     }
 }
 
-/* Phone -------------------------------------------------------------------- */
-@media (max-width:680px){
-    .projects-soon{
-        box-sizing:border-box;
-        padding:0 14px;
+/* Narrow panel (tablets and phones): the screens lead, the story follows
+   underneath in the same column and the stage scrolls. ---------------------- */
+@container (max-width:900px){
+    .project{
+        grid-template-columns:minmax(0, 560px);
+        justify-content:center;
+        align-items:start;
+        gap:24px;
+        padding:18px 16px 26px;
+    }
+    .project-glow{
+        top:0;
+        right:-30%;
+        width:120%;
+        translate:0 -30%;
+    }
+    /* Stacked, the column is as tall as its deck, so it only measures width. */
+    .project-show{
+        order:-1;
+        container-type:inline-size;
         gap:14px;
     }
-    .projects-soon-orb{
-        width:100px;
-        height:100px;
-        margin-bottom:8px;
+    .project-deck{
+        width:96cqw;
+        transform:rotateY(-6deg) rotateX(2deg);
     }
-    .projects-soon-title{
-        font-size:24px;
+    .project-switch + .project{
+        padding-top:68px;
     }
-    .projects-soon-line{
-        font-size:15px;
+    .project-shot{
+        border-radius:10px;
+    }
+    .project-shot-tab,
+    .project-switch-item{
+        min-height:40px;
+        padding:0 14px;
+    }
+    .project-tagline{
+        margin-top:16px;
+    }
+    .project-facts{
+        margin-top:24px;
+    }
+    .project-fact{
+        padding:10px 0;
+    }
+    .project-link{
+        margin-top:24px;
     }
 }

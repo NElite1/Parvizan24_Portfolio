@@ -1,0 +1,33 @@
+[
+    {
+        "name": "NDesigner",
+        "logo": "../work_photos/ndesigner_mark.webp",
+        "tagline": "Where designers connect, create and grow.",
+        "description": "A free online community I founded for designers from every country. Talk in the global chat, write to each other directly, and show your work in one shared portfolio format, so clients find the right designer faster.",
+        "facts": [
+            { "label": "My part", "value": "Founder. Design and code, logo included." },
+            { "label": "Inside", "value": "Global chat, a room for every country, direct messages, portfolios." },
+            { "label": "Next", "value": "5 more projects for the designer community :)" }
+        ],
+        "url": "https://ndesigner.net",
+        "displayUrl": "ndesigner.net",
+        "colors": ["#ff1fd1", "#ff2a2a", "#f4ff1f", "#19ff3c", "#00e5ff", "#1e3cff", "#8a2bff"],
+        "shots": [
+            {
+                "src": "../work_photos/ndesigner_home.webp",
+                "label": "Home",
+                "alt": "The ND home page: the rainbow ND mark beside the words Where Designers Connect. Create. Grow."
+            },
+            {
+                "src": "../work_photos/ndesigner_chat.webp",
+                "label": "Global chat",
+                "alt": "The Global Lounge group chat on ND, with the list of groups and country rooms beside it"
+            },
+            {
+                "src": "../work_photos/ndesigner_portfolio.webp",
+                "label": "Portfolio",
+                "alt": "A designer's portfolio page on ND: profile, best work and the full list of works"
+            }
+        ]
+    }
+]
