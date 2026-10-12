@@ -506,6 +506,9 @@
 /* Same chip as the list, a size up for the overlay. */
 .work-detail-url{
     align-self:flex-start;
+    /* overflow:hidden (for the ellipsis) lets a flex item shrink below its
+       text, so a tall gallery would squash the chip down to its padding. */
+    flex-shrink:0;
     max-width:100%;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -551,7 +554,8 @@
     border-radius:16px;
 
     font-size:14px;
-    color:var(--main-color);
+    /* The link chip's green: --main-color is too dark to read on --layer2. */
+    color:#00A85C;
     font-weight:600;
 }
 
