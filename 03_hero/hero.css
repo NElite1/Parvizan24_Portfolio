@@ -123,12 +123,78 @@
     drop-shadow(0 16px 28px rgba(0,0,0,0.55));
 }
 
-#arrow-to-down{
+/* Bottom band of the hero: the scroll arrow in the middle with a quick link
+   on each side of it (GitHub, NDesigner). The band owns the positioning the
+   arrow used to have on its own. */
+#hero-bottom{
   position:absolute;
   bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:2;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:28px;
+}
+#arrow-to-down{
   display:flex;
   justify-content:center;
   align-items:center;
+}
+
+.hero-quicklink{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  padding:10px 20px 10px 12px;
+  box-sizing:border-box;
+  background:rgba(20,20,20,.75);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  box-shadow:0 10px 26px rgba(0,0,0,.45);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  color:var(--text);
+  white-space:nowrap;
+  transition:border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+.hero-quicklink:hover,
+.hero-quicklink:focus-visible{
+  border-color:color-mix(in srgb, var(--main-color) 70%, white 30%);
+  box-shadow:
+    0 0 22px -4px var(--main-color),
+    0 10px 26px rgba(0,0,0,.45);
+  transform:translateY(-2px);
+}
+.hero-quicklink:focus-visible{
+  outline:2px solid var(--text);
+  outline-offset:3px;
+}
+.hero-quicklink-logo{
+  width:32px;
+  height:32px;
+  flex:0 0 auto;
+  object-fit:contain;
+}
+.hero-quicklink-text{
+  display:flex;
+  flex-direction:column;
+  font-family:Inter, sans-serif;
+  line-height:1.2;
+}
+.hero-quicklink-name{
+  font-size:0.95rem;
+  font-weight:600;
+  letter-spacing:-0.01em;
+}
+.hero-quicklink-label{
+  font-size:0.78rem;
+  font-weight:400;
+  letter-spacing:0.02em;
+  color:rgba(255,255,255,.6);
 }
 
 /* Tablet: same two columns, just breathing room at the edges --------------- */
@@ -183,14 +249,47 @@
        the portrait hard enough that it still lands above the fold. */
     max-height:40vh;
   }
-  #arrow-to-down{
+  #hero-bottom{
     bottom:18px;
-    left:50%;
-    transform:translateX(-50%);
+    gap:16px;
   }
   #arrow-to-down img{
     width:52px;
   }
+}
+
+/* Phones: two chips plus the arrow don't fit on one line, so the chips share
+   the top row and the arrow drops underneath them. The section gets the extra
+   bottom padding so the band never sits on the portrait. */
+@media (max-width:600px){
+  #hero{
+    padding-bottom:150px;
+  }
+  #hero-bottom{
+    width:100%;
+    box-sizing:border-box;
+    padding:0 16px;
+    flex-wrap:wrap;
+    gap:10px 12px;
+  }
+  #arrow-to-down{
+    order:1;
+    flex-basis:100%;
+  }
+  #arrow-to-down img{
+    width:44px;
+  }
+  .hero-quicklink{
+    flex:0 1 auto;
+    gap:10px;
+    padding:8px 16px 8px 10px;
+  }
+  .hero-quicklink-logo{
+    width:28px;
+    height:28px;
+  }
+  .hero-quicklink-name{ font-size:0.88rem; }
+  .hero-quicklink-label{ font-size:0.72rem; }
 }
 
 /* Short portrait phones (roughly 360x640 through iPhone SE): the copy alone is
@@ -200,7 +299,7 @@
    taller phone keeps the full copy. */
 @media (max-width:900px) and (orientation:portrait) and (max-height:700px){
   #hero{
-    padding:60px 24px 30px;
+    padding:60px 24px 130px;
     gap:16px;
   }
   #hero-content{
@@ -222,7 +321,9 @@
     flex-direction:row;
     align-items:center;
     gap:20px;
-    padding:70px 20px 30px;
+    /* Bottom padding is the quick-link band's height plus its 6px offset, so
+       the chips sit below the copy instead of on top of it. */
+    padding:70px 20px 76px;
   }
   #hero-content{
     width:auto;
@@ -236,7 +337,7 @@
   #hero-photo img{
     max-height:72vh;
   }
-  #arrow-to-down{
+  #hero-bottom{
     bottom:6px;
   }
   #arrow-to-down img{
