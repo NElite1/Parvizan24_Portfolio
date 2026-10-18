@@ -1,16 +1,27 @@
 #navbar{
+  /* Light tint of the purple accent: the raw #4A067D is too dark to read as a
+     line on the black bar, so the indicator and focus ring use this. */
+  --nav-accent:color-mix(in srgb, var(--secondary-color) 55%, white);
+
   position:fixed;
+  top:0;
+  left:0;
   width:100%;
-  height:50px;
+  height:56px;
+  box-sizing:border-box;
   display:flex;
-  flex-direction:row;  
+  flex-direction:row;
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  background-color:rgba(0,0,0,0.5);
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px); 
+  /* A touch more opaque than before so the links stay readable over the
+     bright parts of the page, plus a hairline to separate bar from content. */
+  background-color:rgba(0,0,0,0.62);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   z-index:100;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1);
 }
 .logo{
   flex:0.75;
@@ -20,8 +31,22 @@
   align-items:center;
   z-index:10;
 }
+/* The logo is a link too: give it the same comfortable hit area as the rest. */
+.logo-link{
+  display:flex;
+  align-items:center;
+  height:44px;
+  padding:0 10px;
+  border-radius:12px;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease-out;
+}
+.logo-link:active{
+  transform:scale(0.96);
+}
 .PN{
   height:30px;
+  display:block;
 }
 .nav-links{
   flex:3;
@@ -31,62 +56,131 @@
   align-items:center;
   gap:50px;
   padding-right:100px;
-  
+  min-width:0;
 }
 .navlink{
+  position:relative;
   display:flex;
   flex-direction:row;
   justify-content:center;
   align-items:center;
-  gap:5px;
+  gap:6px;
+  /* 150px is the preferred width (keeps the even spacing), but links may
+     shrink on narrow screens instead of pushing the bar wider than the page. */
   width:150px;
-  height:30px;
-  border-width:0px;
-  border-radius:15px;
-  transition: hover, 0.2s;
+  flex:0 1 auto;
+  min-width:0;
+  height:40px;
+  border-radius:999px;
+  color:var(--text);
+  -webkit-tap-highlight-color:transparent;
+  transition:
+    background-color .2s ease,
+    filter .2s ease,
+    transform .15s ease-out;
 }
-.navlink:hover{
-  width:175px;
-  filter:
-    drop-shadow(0 0 10px var(--secondary-color))
-    drop-shadow(0 0 20px var(--secondary-color))
-    ;
-  text-decoration:underline;
+.navlink-text{
+  position:relative;
+  font-family:Inter, sans-serif;
+  font-size:1rem;
+  font-weight:400;
+  line-height:1.4em;
+  letter-spacing:0.02em;
+  white-space:nowrap;
+}
+/* Indicator under the label: hidden by default, half-drawn on hover, fully
+   drawn for the section you're currently reading (aria-current, set by
+   navbar.js). Drawn with transform so it slides in without moving anything. */
+.navlink-text::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-5px;
+  height:2px;
+  border-radius:2px;
+  background:var(--nav-accent);
+  box-shadow:0 0 8px var(--secondary-color);
+  transform:scaleX(0);
+  opacity:0;
+  transition:transform .25s cubic-bezier(.2,.8,.2,1), opacity .25s ease;
+}
+.navlink[aria-current] .navlink-text::after{
+  transform:scaleX(1);
+  opacity:1;
 }
 .navlink-icon{
   width:24px;
   height:24px;
+  flex:0 0 auto;
   transform: translateY(1px);
 }
-.contacts-button{
-  flex:1;
-  display:flex;
-  flex-direction:row;
-  justify-content:center;
-  align-items:center;
+
+/* Hover only where there is a real pointer - on touch screens a tapped link
+   would otherwise keep its glow until you tap somewhere else. The link no
+   longer widens on hover (it used to, which shoved its neighbours sideways
+   under the cursor); the glow and the indicator carry the feedback. */
+@media (hover:hover){
+  .navlink:hover{
+    background-color:rgba(255,255,255,0.06);
+    filter:
+      drop-shadow(0 0 10px var(--secondary-color))
+      drop-shadow(0 0 20px var(--secondary-color))
+      ;
+  }
+  .navlink:hover:not([aria-current]) .navlink-text::after{
+    transform:scaleX(0.5);
+    opacity:0.7;
+  }
+}
+.navlink:active{
+  transform:scale(0.96);
+  background-color:rgba(255,255,255,0.09);
+}
+
+/* Keyboard focus: a clear ring on the dark bar (the browser default barely
+   shows on it). Mouse clicks don't trigger it. */
+.navlink:focus-visible,
+.logo-link:focus-visible,
+.skip-link:focus-visible{
+  outline:2px solid var(--nav-accent);
+  outline-offset:2px;
+}
+
+/* First Tab on the page lands here: jumps past the navbar to the content. */
+.skip-link{
+  position:fixed;
+  top:8px;
+  left:8px;
+  z-index:200;
+  padding:10px 16px;
+  border-radius:12px;
+  background:var(--layer1);
+  color:var(--text);
+  font-family:Inter, sans-serif;
+  font-size:0.9rem;
+  transform:translateY(-200%);
+  transition:transform .2s ease;
+}
+.skip-link:focus-visible{
+  transform:translateY(0);
 }
 
 .hidden-navbar{
   transform:translateY(-100%);
-  transition:transform 0.3s ease-in-out;
-}
-
-.shown-navbar{
-  transform:translateY(0);
-  transition:transform 0.3s ease-in-out;
 }
 
 /* Tablet: same layout, tighter spacing ------------------------------------- */
 @media (max-width:1024px){
   .nav-links{
-    gap:20px;
-    padding-right:30px;
+    gap:16px;
+    padding-right:24px;
   }
   .navlink{
     width:130px;
   }
-  .navlink:hover{
-    width:145px;
+  .navlink-text{
+    font-size:0.88rem;
   }
   .navlink-icon{
     width:20px;
@@ -100,53 +194,74 @@
 /* Phone: text-only links, evenly spread ------------------------------------ */
 @media (max-width:680px){
   #navbar{
-    height:44px;
+    height:52px;
+    gap:4px;
   }
   .logo{
     flex:0 0 auto;
-    padding-left:8px;
+    padding-left:4px;
+  }
+  .logo-link{
+    padding:0 8px;
   }
   .PN{
-    height:20px;
+    height:21px;
   }
   .nav-links{
     flex:1;
     justify-content:space-evenly;
     gap:2px;
     padding-right:4px;
-    min-width:0;
   }
+  /* Full 44px-tall tap targets (they were 30px), and text big enough to read
+     at arm's length (it was ~11px). */
   .navlink{
     width:auto;
-    padding:0 3px;
+    height:44px;
+    padding:0 8px;
     gap:4px;
-  }
-  .navlink:hover{
-    width:auto;
+    border-radius:12px;
   }
   .navlink-icon{
     display:none;
   }
-  .navlink h3{
-    font-size:0.72rem;
-    white-space:nowrap;
+  .navlink-text{
+    font-size:0.8125rem;
+    letter-spacing:0.01em;
+  }
+  .navlink-text::after{
+    bottom:-6px;
   }
 }
 
 /* Small phone: keep all four links on screen ------------------------------- */
 @media (max-width:400px){
-  .logo{
-    padding-left:6px;
+  .logo-link{
+    padding:0 6px;
   }
   .PN{
-    height:17px;
+    height:18px;
+  }
+  .nav-links{
+    gap:0;
+    padding-right:2px;
   }
   .navlink{
-    padding:0 2px;
-    gap:3px;
+    padding:0 6px;
   }
-  .navlink h3{
-    font-size:0.66rem;
+  .navlink-text{
+    font-size:0.78rem;
     letter-spacing:0;
+  }
+}
+
+/* Reduced motion: the bar still hides and shows, just without sliding. */
+@media (prefers-reduced-motion:reduce){
+  #navbar,
+  .navlink,
+  .navlink-text::after,
+  .logo-link,
+  .skip-link{
+    transition:none;
   }
 }

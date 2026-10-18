@@ -6,8 +6,10 @@
   --secondary-color: #4A067D;
   --text: #ffffff;
 }
-html {
-  scroll-behavior: smooth;
+@media (prefers-reduced-motion:no-preference){
+  html {
+    scroll-behavior: smooth;
+  }
 }
 *{
   scrollbar-width:none;
