@@ -98,11 +98,6 @@ function buildShell() {
                   <h3>Portfolio</h3>
                 </div>
 
-                <button type="button" class="portfolio-overview-activated" id="portfolioOverview">
-                    <img src="icons/Grid.png" alt="" class="portfolio-overview-icon">
-                    <h3>Overview</h3>
-                </button>
-
                 <div class="portfolio-section-activated" id="myWorks">
                     <img src="icons/Cube.png" alt="My Works" class="portfolio-section-icon-activated">
                     <h3>My Works</h3>
@@ -117,6 +112,11 @@ function buildShell() {
                     <img src="icons/address_book.png" alt="Skills" class="portfolio-section-icon-activated">
                     <h3>Skills</h3>
                 </div>
+
+                <button type="button" class="portfolio-overview-activated" id="portfolioOverview">
+                    <img src="icons/Grid.png" alt="" class="portfolio-overview-icon">
+                    <h3>Overview</h3>
+                </button>
 
             </div>
 

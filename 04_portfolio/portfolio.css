@@ -192,7 +192,7 @@
     width:80px;
     height:80px;
 }
-/* Back to the overview dashboard: a slim button above the section cards. */
+/* Back to the overview dashboard: a slim button under the section cards. */
 .portfolio-overview-activated{
     width:115px;
     height:44px;
@@ -383,7 +383,8 @@
     .portfolio-overview-activated h3{
         font-size:0.7rem;
     }
-    /* In the tab bar Overview is a tab like the others: icon over label. */
+    /* In the tab bar Overview is a tab like the others (the last one): icon
+       over label. */
     .portfolio-overview-activated{
         flex-direction:column;
         gap:4px;
