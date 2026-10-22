@@ -2,14 +2,21 @@ import { loadWorks } from "../my_works/my_works.js";
 import { loadProjects } from "../my_projects/my_projects.js";
 import { loadSkills } from "../skills/skills.js";
 
-// The Portfolio's first layer: everything in the three sections, counted and
-// charted. Nothing here is typed in by hand - every number comes from the same
-// Data/ files the sections render, so adding a work updates the overview too.
-// Every tile, slice, bar and point opens the section it counts.
+// The Portfolio's first layer. A header bar names the section and sums it up
+// in one sentence of counts; the newest works follow as a carousel of their
+// real pictures, with works by type, skills, works per month beside a table
+// of totals, and a held place for social media stats still to come.
+// Nothing is typed in by hand; every figure comes from the same Data/ files
+// the sections render, and everything opens the section, tab or item it shows.
+// Every view stays the same size however much is added: the carousel keeps
+// the newest few, skills show the first few per area, and the monthly line
+// groups long histories into quarters.
+//
+// The views are linked: pointing at a work lights its slices in the donut and
+// its month on the line; pointing at a type lights everything of that type.
 
-// Work types in the order of the My Works tabs. A colour belongs to its type,
-// so Design is the same violet in the donut and in the skills bars. Types with
-// no works are left out of the charts (Good Person :) has no file at all).
+// Work types in the order of the My Works tabs. A colour belongs to its type
+// in every view. Types with no works are left out (Good Person :) has no file).
 const WORK_TYPES = [
     { key: "design", label: "Design" },
     { key: "programming", label: "Programming" },
@@ -19,13 +26,28 @@ const TYPE_COLORS = {
     design: "var(--dash-design)",
     programming: "var(--dash-programming)",
     engineering: "var(--dash-engineering)",
+    project: "var(--dash-project)",
 };
+
+// The carousel shows the newest works only; the rest live in My Works.
+const CAROUSEL_SIZE = 5;
+// Skill names shown per area before "+N more".
+const SKILLS_PER_AREA = 3;
+// Past this many months the line counts per quarter instead of per month.
+const MAX_MONTHS = 24;
+// Names listed in a point's tooltip before "+N more".
+const NAMES_IN_TIP = 3;
 
 const ARROW_ICON = `
     <svg class="dash-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M7 17 17 7"/>
         <path d="M8 7h9v9"/>
+    </svg>`;
+const CHEVRON_ICON = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 6-6 6 6 6"/>
     </svg>`;
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -52,12 +74,22 @@ function button(className, onClick) {
     return el;
 }
 
+function swatch(color) {
+    const el = make("span", "dash-swatch");
+    el.style.background = color;
+    return el;
+}
+
 function capitalize(word) {
     return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
 function plural(count, one, many = `${one}s`) {
     return count === 1 ? one : many;
+}
+
+function typeLabel(key) {
+    return WORK_TYPES.find(type => type.key === key)?.label ?? capitalize(key);
 }
 
 // "2026-05" -> a running month number (year * 12 + month), so months can be
@@ -80,6 +112,58 @@ function currentMonth() {
 
 // --- numbers -----------------------------------------------------------------
 
+// One item per work, however many tabs list it, plus any project that is not
+// also a work. This is what the carousel shows and what the views link by name.
+function collectItems(works, projects) {
+    const items = new Map();
+
+    works.forEach(work => {
+        let item = items.get(work.name);
+        if (!item) {
+            item = {
+                name: work.name,
+                month: monthIndex(work.date),
+                types: [],
+                // The work's own picture from its JSON entry; the first
+                // gallery shot when it has none.
+                image: work.image || (Array.isArray(work.images) && work.images.find(Boolean)),
+                logo: work.logo,
+                project: false,
+            };
+            items.set(work.name, item);
+        }
+        if (!item.types.includes(work.type)) item.types.push(work.type);
+    });
+
+    projects.forEach(project => {
+        let item = items.get(project.name);
+        if (!item) {
+            item = {
+                name: project.name,
+                month: monthIndex(project.date),
+                types: [],
+                image: project.shots?.[0]?.src,
+                logo: project.logo,
+            };
+            items.set(project.name, item);
+        }
+        item.project = true;
+        item.logo ||= project.logo;
+    });
+
+    items.forEach(item => {
+        // A project opens Projects; a work opens My Works on the first tab
+        // that lists it, with its detail already open.
+        const firstType = WORK_TYPES.find(type => item.types.includes(type.key));
+        item.target = item.project || !firstType
+            ? ["projects", {}]
+            : ["myWorks", { tab: firstType.key, open: item.name }];
+    });
+
+    // Newest first; undated works go last, in file order.
+    return [...items.values()].sort((a, b) => (b.month ?? -Infinity) - (a.month ?? -Infinity));
+}
+
 function summarize(works, projects, skills) {
     const byType = WORK_TYPES
         .map(type => ({ ...type, count: works.filter(work => work.type === type.key).length }))
@@ -91,59 +175,112 @@ function summarize(works, projects, skills) {
         skills: Object.values(group ?? {}),
     }));
 
-    // The timeline counts the same entries as the tiles (a work listed in two
-    // tabs counts twice), placed at the month written in their "date".
+    const items = collectItems(works, projects);
+
+    // The monthly line counts the same entries as the headline (a work listed
+    // in two tabs counts once per tab), placed at the month in their "date".
     const events = [
         ...works.map(work => ({ name: work.name, type: work.type, month: monthIndex(work.date) })),
         ...projects.map(project => ({ name: project.name, type: "project", month: monthIndex(project.date) })),
-    ].filter(event => event.month !== null);
+    ];
 
     return {
         works: works.length,
-        projects,
+        projects: projects.length,
         skills: areas.reduce((sum, area) => sum + area.skills.length, 0),
         byType,
         areas,
-        timeline: buildTimeline(events),
+        items,
+        events,
+        monthly: buildMonthly(events.filter(event => event.month !== null)),
     };
 }
 
-// Month-by-month running total from the first dated entry up to this month,
-// plus what launched in each month. A launch opens where it lives: a project
-// opens Projects, a work opens My Works on the first tab that lists it.
-function buildTimeline(events) {
+// How many entries were made in each month, from the first dated one up to
+// this month - quiet months included, so the line falls as well as rises.
+// Longer than MAX_MONTHS and it counts per quarter instead.
+function buildMonthly(events) {
     if (events.length === 0) return null;
 
     const first = Math.min(...events.map(event => event.month));
     const last = Math.max(currentMonth(), ...events.map(event => event.month));
+    const byQuarter = last - first + 1 > MAX_MONTHS;
 
-    const months = [];
-    let total = 0;
-    for (let month = first; month <= last; month++) {
-        const here = events.filter(event => event.month === month);
-        total += here.length;
-
-        const launches = [];
-        here.forEach(event => {
-            let launch = launches.find(item => item.name === event.name);
-            if (!launch) {
-                launch = { name: event.name, added: 0, kinds: [] };
-                launches.push(launch);
-            }
-            launch.added += 1;
-            launch.kinds.push(event.type);
+    const bucketOf = month => (byQuarter ? Math.floor(month / 3) : month);
+    const buckets = [];
+    for (let key = bucketOf(first); key <= bucketOf(last); key++) {
+        const year = Math.floor((byQuarter ? key * 3 : key) / 12);
+        buckets.push({
+            key,
+            // Quarters always carry a short year ("Q2 ’25"): thinned out, a
+            // bare "Q3" would not say which year it is.
+            label: byQuarter ? `Q${(key % 4) + 1} ’${String(year).slice(2)}` : monthLabel(key),
+            fullLabel: byQuarter ? `Q${(key % 4) + 1} ${year}` : monthLabel(key, true),
+            // A month tick names the year where a new one begins.
+            yearStart: !byQuarter && key % 12 === 0,
+            year,
+            count: 0,
+            names: [],
+            types: new Set(),
         });
-        launches.forEach(launch => {
-            const firstType = WORK_TYPES.find(type => launch.kinds.includes(type.key));
-            launch.target = launch.kinds.includes("project") || !firstType
-                ? ["projects", {}]
-                : ["myWorks", { tab: firstType.key, open: launch.name }];
-        });
-
-        months.push({ month, total, launches });
     }
 
-    return { first, months };
+    events.forEach(event => {
+        const bucket = buckets[bucketOf(event.month) - bucketOf(first)];
+        bucket.count += 1;
+        bucket.types.add(event.type);
+        if (!bucket.names.includes(event.name)) bucket.names.push(event.name);
+    });
+
+    const busiest = buckets.reduce((best, bucket) => (bucket.count > best.count ? bucket : best), buckets[0]);
+    const months = last - first + 1;
+
+    return {
+        first,
+        byQuarter,
+        buckets,
+        busiest,
+        perMonth: events.length / months,
+    };
+}
+
+// --- linked views ------------------------------------------------------------
+
+// A work's own marks carry data-work; a mark holding several works (a month
+// on the line) carries data-works, names joined by "|"; both carry
+// data-types. Type marks carry data-type. focus({ work }) or focus({ type })
+// dims the rest of the dashboard; focus(null) clears it.
+function createFocus(root, items) {
+    const typesOf = name => items.find(item => item.name === name)?.types ?? [];
+
+    const set = (el, state, on) => {
+        el.classList.toggle("is-lit", Boolean(state) && on);
+        el.classList.toggle("is-dim", !on);
+    };
+
+    return state => {
+        root.classList.toggle("has-focus", Boolean(state));
+
+        root.querySelectorAll("[data-work], [data-works]").forEach(el => {
+            const names = el.dataset.works ? el.dataset.works.split("|") : [el.dataset.work];
+            const types = el.dataset.types.split(" ");
+            set(el, state, !state || (state.work !== undefined ? names.includes(state.work) : types.includes(state.type)));
+        });
+
+        root.querySelectorAll("[data-type]").forEach(el => {
+            const on = !state
+                || (state.type !== undefined ? el.dataset.type === state.type : typesOf(state.work).includes(el.dataset.type));
+            set(el, state, on);
+        });
+    };
+}
+
+// Hover and keyboard focus both light the same things.
+function bindFocus(el, focus, state) {
+    el.addEventListener("pointerenter", () => focus(state));
+    el.addEventListener("pointerleave", () => focus(null));
+    el.addEventListener("focus", () => focus(state));
+    el.addEventListener("blur", () => focus(null));
 }
 
 // --- tooltip -----------------------------------------------------------------
@@ -175,7 +312,6 @@ function createTooltip(root) {
     };
 }
 
-// Hover and keyboard focus show the same readout, above the element.
 function bindTip(tip, el, read) {
     const show = () => {
         const box = el.getBoundingClientRect();
@@ -188,34 +324,7 @@ function bindTip(tip, el, read) {
     el.addEventListener("blur", tip.hide);
 }
 
-// --- pieces ------------------------------------------------------------------
-
-function buildCard(className, title, hint) {
-    const card = make("section", `dash-card ${className}`);
-    const head = make("header", "dash-card-head");
-    head.appendChild(make("h3", "dash-card-title", title));
-    if (hint) head.appendChild(make("span", "dash-card-hint", hint));
-    const body = make("div", "dash-card-body");
-    card.append(head, body);
-    return { card, body };
-}
-
-// Big-number tile. A tile with onClick is a button into its section.
-function buildKpi(label, onClick) {
-    const tile = onClick ? button("dash-card dash-kpi", onClick) : make("div", "dash-card dash-kpi");
-    const value = make("span", "dash-kpi-value", "–");
-    const note = make("span", "dash-kpi-note", " ");
-    tile.append(make("span", "dash-kpi-label", label), value, note);
-    if (onClick) tile.insertAdjacentHTML("beforeend", ARROW_ICON);
-
-    return {
-        tile,
-        set(count, text, reveal) {
-            note.textContent = text;
-            reveal(() => countUp(value, count));
-        },
-    };
-}
+// --- headline ----------------------------------------------------------------
 
 function countUp(el, target) {
     if (reducedMotion() || target === 0) {
@@ -223,17 +332,186 @@ function countUp(el, target) {
         return;
     }
     const start = performance.now();
-    const duration = 700;
+    const duration = 900;
     const step = now => {
         const t = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
+        const eased = 1 - Math.pow(1 - t, 4);
         el.textContent = String(Math.round(target * eased));
         if (t < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
 }
 
-function fillDonut(body, byType, tip, open, reveal) {
+// "6 works, 1 project and 4 skills, built in 6 months." Each count is a way
+// into its section; the months are the line's job.
+function fillHeadline(headline, stats, open, reveal) {
+    const counts = [];
+    const phrase = (count, one, section, sectionName) => {
+        const link = button("dash-count", () => open(section));
+        const number = make("span", "dash-count-number", String(count));
+        link.append(number, ` ${plural(count, one)}`);
+        link.setAttribute("aria-label", `${count} ${plural(count, one)}. Open ${sectionName}`);
+        counts.push([number, count]);
+        return link;
+    };
+
+    headline.replaceChildren(
+        phrase(stats.works, "work", "myWorks", "My Works"), ", ",
+        phrase(stats.projects, "project", "projects", "Projects"), " and ",
+        phrase(stats.skills, "skill", "skills", "Skills"),
+    );
+
+    if (stats.monthly) {
+        const months = currentMonth() - stats.monthly.first + 1;
+        const number = make("span", "dash-count-number", String(months));
+        const span = make("span", "dash-months");
+        span.append(number, ` ${plural(months, "month")}`);
+        counts.push([number, months]);
+        headline.append(", built in ", span);
+    }
+    headline.append(".");
+
+    reveal(() => counts.forEach(([el, value]) => countUp(el, value)));
+}
+
+// --- latest works: carousel --------------------------------------------------
+
+function buildWorkCard(item, index, focus, open) {
+    const card = button("dash-work", () => open(...item.target));
+    card.dataset.work = item.name;
+    card.dataset.types = item.types.join(" ");
+    card.style.setProperty("--i", index);
+
+    const media = make("span", "dash-work-media");
+    if (item.image) {
+        const img = make("img", "dash-work-img");
+        img.src = item.image;
+        img.alt = "";
+        img.decoding = "async";
+        // A square picture is a logo or an app icon, not a screen: it sits
+        // whole in the middle, over a blurred wash of its own colours.
+        img.addEventListener("load", () => {
+            if (Math.abs(img.naturalWidth / img.naturalHeight - 1) < 0.2) {
+                card.classList.add("is-mark");
+                media.style.setProperty("--work-wash", `url("${img.currentSrc}")`);
+            }
+        });
+        img.addEventListener("error", () => img.remove());
+        media.appendChild(img);
+    }
+    const go = make("span", "dash-work-go");
+    go.insertAdjacentHTML("beforeend", ARROW_ICON);
+    media.appendChild(go);
+
+    const info = make("span", "dash-work-info");
+    const title = make("span", "dash-work-title");
+    if (item.logo) {
+        const logo = make("img", "dash-work-logo");
+        logo.src = item.logo;
+        logo.alt = "";
+        logo.addEventListener("error", () => logo.remove());
+        title.appendChild(logo);
+    }
+    title.appendChild(make("span", "dash-work-name", item.name));
+
+    const meta = make("span", "dash-work-meta");
+    if (item.month !== null) meta.appendChild(make("span", "dash-work-date", monthLabel(item.month, true)));
+    const tags = make("span", "dash-work-tags");
+    [...item.types, ...(item.project ? ["project"] : [])].forEach(key => {
+        const tag = make("span", "dash-work-tag", key === "project" ? "Project" : typeLabel(key));
+        tag.style.setProperty("--tag", TYPE_COLORS[key] ?? "var(--dash-ink-2)");
+        tags.appendChild(tag);
+    });
+    meta.appendChild(tags);
+    info.append(title, meta);
+
+    card.append(media, info);
+    card.setAttribute("aria-label", `${item.name}${item.month !== null ? `, ${monthLabel(item.month, true)}` : ""}. Open ${item.project ? "the project" : "this work"}`);
+    bindFocus(card, focus, { work: item.name });
+    return card;
+}
+
+function fillCarousel(section, items, worksCount, focus, open, reveal) {
+    const { head, body } = section;
+
+    if (items.length === 0) {
+        body.appendChild(make("p", "dash-empty", "No works yet"));
+        return;
+    }
+
+    const latest = items.slice(0, CAROUSEL_SIZE);
+
+    const track = make("div", "dash-track");
+    track.setAttribute("tabindex", "-1");
+    latest.forEach((item, index) => track.appendChild(buildWorkCard(item, index, focus, open)));
+
+    // The last card is the way to everything else.
+    const all = button("dash-work dash-work-all", () => open("myWorks"));
+    all.style.setProperty("--i", latest.length);
+    all.append(
+        make("span", "dash-work-all-count", String(worksCount)),
+        make("span", "dash-work-all-label", `${plural(worksCount, "work")} in My Works`),
+    );
+    const allGo = make("span", "dash-work-all-go", "Open all");
+    allGo.insertAdjacentHTML("beforeend", ARROW_ICON);
+    all.appendChild(allGo);
+    track.appendChild(all);
+
+    const controls = make("div", "dash-carousel-controls");
+    const counter = make("span", "dash-carousel-counter");
+    counter.setAttribute("aria-live", "polite");
+    const prev = button("dash-carousel-arrow", () => page(-1));
+    const next = button("dash-carousel-arrow is-next", () => page(1));
+    prev.setAttribute("aria-label", "Previous works");
+    next.setAttribute("aria-label", "Next works");
+    prev.insertAdjacentHTML("beforeend", CHEVRON_ICON);
+    next.insertAdjacentHTML("beforeend", CHEVRON_ICON);
+    controls.append(counter, prev, next);
+    head.appendChild(controls);
+
+    const progress = make("div", "dash-carousel-progress");
+    const bar = make("span");
+    progress.appendChild(bar);
+
+    // One card's width plus the gap: the distance between card starts.
+    const stepSize = () => {
+        const cards = track.children;
+        return cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+    };
+    const page = direction => {
+        const step = stepSize();
+        const visible = Math.max(1, Math.floor((track.clientWidth + 1) / step));
+        track.scrollBy({ left: direction * step * visible, behavior: reducedMotion() ? "auto" : "smooth" });
+    };
+
+    let frame = 0;
+    const update = () => {
+        frame = 0;
+        const step = stepSize();
+        const max = track.scrollWidth - track.clientWidth;
+        const first = Math.min(Math.round(track.scrollLeft / step), latest.length - 1);
+        const visible = Math.max(1, Math.floor((track.clientWidth + 1) / step));
+        const lastShown = Math.min(first + visible, latest.length);
+        counter.textContent = `${first + 1}–${lastShown} of ${latest.length} newest`;
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = track.scrollLeft >= max - 2;
+        const shown = max > 0 ? track.clientWidth / track.scrollWidth : 1;
+        bar.style.width = `${shown * 100}%`;
+        bar.style.marginLeft = `${max > 0 ? (track.scrollLeft / track.scrollWidth) * 100 : 0}%`;
+    };
+    const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+    };
+    track.addEventListener("scroll", schedule, { passive: true });
+    new ResizeObserver(schedule).observe(track);
+
+    body.append(track, progress);
+    reveal(() => track.classList.add("revealed"));
+}
+
+// --- works by type: donut ----------------------------------------------------
+
+function fillDonut(body, byType, tip, focus, open, reveal) {
     const total = byType.reduce((sum, type) => sum + type.count, 0);
     if (total === 0) {
         body.appendChild(make("p", "dash-empty", "No works yet"));
@@ -242,7 +520,7 @@ function fillDonut(body, byType, tip, open, reveal) {
 
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
-    // A 2px-ish gap of card colour between slices; none when there is only one.
+    // A 2px-ish gap of panel colour between slices; none for a single slice.
     const gap = byType.length > 1 ? 1.4 : 0;
 
     const wrap = make("div", "dash-donut");
@@ -250,10 +528,6 @@ function fillDonut(body, byType, tip, open, reveal) {
     svg.appendChild(makeSvg("circle", { class: "dash-donut-track", cx: 50, cy: 50, r: radius }));
 
     const slices = [];
-    // Pointing at a slice or its legend row dims every other slice.
-    const highlight = key => slices.forEach(({ slice, type }) => {
-        slice.classList.toggle("dimmed", key !== null && type.key !== key);
-    });
     let start = 0;
     byType.forEach(type => {
         const length = (type.count / total) * circumference;
@@ -265,6 +539,7 @@ function fillDonut(body, byType, tip, open, reveal) {
             "stroke-dasharray": `0 ${circumference}`,
             transform: "rotate(-90 50 50)",
         });
+        slice.dataset.type = type.key;
         const finalDash = `${Math.max(length - gap, 0.01)} ${circumference}`;
         start += length;
 
@@ -277,19 +552,17 @@ function fillDonut(body, byType, tip, open, reveal) {
             const [text, detail] = readout();
             tip.show(text, detail, e.clientX, e.clientY - 10);
         });
-        slice.addEventListener("pointerenter", () => highlight(type.key));
+        slice.addEventListener("pointerenter", () => focus({ type: type.key }));
         slice.addEventListener("pointerleave", () => {
             tip.hide();
-            highlight(null);
+            focus(null);
         });
         slices.push({ slice, finalDash, type, readout, go });
         svg.appendChild(slice);
     });
 
     const center = make("div", "dash-donut-center");
-    const centerValue = make("span", "dash-donut-total", String(total));
-    center.append(centerValue, make("span", "dash-donut-unit", plural(total, "work")));
-
+    center.append(make("span", "dash-donut-total", String(total)), make("span", "dash-donut-unit", plural(total, "work")));
     wrap.append(svg, center);
 
     // The legend carries every value, so nothing depends on hovering; it is
@@ -298,14 +571,10 @@ function fillDonut(body, byType, tip, open, reveal) {
     slices.forEach(({ type, readout, go }) => {
         const item = make("li");
         const link = button("dash-legend-item", go);
-        const swatch = make("span", "dash-swatch");
-        swatch.style.background = TYPE_COLORS[type.key];
-        link.append(swatch, make("span", "dash-legend-label", type.label), make("span", "dash-legend-value", String(type.count)));
-        link.addEventListener("pointerenter", () => highlight(type.key));
-        link.addEventListener("pointerleave", () => highlight(null));
-        link.addEventListener("focus", () => highlight(type.key));
-        link.addEventListener("blur", () => highlight(null));
+        link.dataset.type = type.key;
+        link.append(swatch(TYPE_COLORS[type.key]), make("span", "dash-legend-label", type.label), make("span", "dash-legend-value", String(type.count)));
         link.setAttribute("aria-label", `${readout().join(", ")}. Open in My Works`);
+        bindFocus(link, focus, { type: type.key });
         item.appendChild(link);
         legend.appendChild(item);
     });
@@ -314,123 +583,212 @@ function fillDonut(body, byType, tip, open, reveal) {
     reveal(() => slices.forEach(({ slice, finalDash }) => slice.setAttribute("stroke-dasharray", finalDash)));
 }
 
+// --- skills ------------------------------------------------------------------
+
+// One bar split by area (the share of all skills), then the first few skills
+// of each area by name and a "+N more" into Skills for the rest.
 function fillSkills(body, areas, tip, open, reveal) {
-    const max = Math.max(1, ...areas.map(area => area.skills.length));
-    if (areas.length === 0) {
+    const total = areas.reduce((sum, area) => sum + area.skills.length, 0);
+    if (total === 0) {
         body.appendChild(make("p", "dash-empty", "No skills yet"));
         return;
     }
 
-    const fills = [];
+    const bar = make("div", "dash-split");
+    const groups = make("div", "dash-skill-groups");
+
     areas.forEach(area => {
         const count = area.skills.length;
-        const block = make("div", "dash-area");
+        if (count === 0) return;
+        const color = TYPE_COLORS[area.key] ?? "var(--dash-ink-2)";
+        const openArea = () => open("skills", { tab: area.key });
 
-        const row = button("dash-bar-row", () => open("skills", { tab: area.key }));
-        const track = make("span", "dash-bar-track");
-        const fill = make("span", "dash-bar-fill");
-        fill.style.background = TYPE_COLORS[area.key] ?? "var(--dash-ink-2)";
-        fill.style.setProperty("--share", count / max);
-        track.appendChild(fill);
-        row.append(make("span", "dash-bar-label", area.label), track, make("span", "dash-bar-value", String(count)));
-        row.setAttribute("aria-label", `${area.label}: ${count} ${plural(count, "skill")}. Open in Skills`);
-        bindTip(tip, row, () => [`${count} ${plural(count, "skill")}`, area.label]);
-        fills.push(fill);
+        const segment = button("dash-split-part", openArea);
+        segment.style.setProperty("--share", count);
+        segment.style.background = color;
+        segment.setAttribute("aria-label", `${area.label}: ${count} ${plural(count, "skill")}. Open in Skills`);
+        bindTip(tip, segment, () => [`${count} ${plural(count, "skill")}`, `${area.label} · ${Math.round((count / total) * 100)}%`]);
+        bar.appendChild(segment);
 
-        const chips = make("div", "dash-chips");
-        area.skills.forEach(skill => {
+        const group = make("div", "dash-skill-group");
+        const head = button("dash-skill-area", openArea);
+        head.append(swatch(color), make("span", "dash-skill-area-label", area.label), make("span", "dash-legend-value", String(count)));
+        group.appendChild(head);
+
+        const list = make("ul", "dash-skill-list");
+        area.skills.slice(0, SKILLS_PER_AREA).forEach(skill => {
             const name = (skill.name ?? "").trim();
-            const chip = button("dash-chip", () => open("skills", { tab: area.key, open: name }));
-            chip.textContent = name;
-            chips.appendChild(chip);
+            const li = make("li");
+            const link = button("dash-skill", () => open("skills", { tab: area.key, open: name }));
+            link.textContent = name;
+            li.appendChild(link);
+            list.appendChild(li);
         });
-
-        block.append(row, chips);
-        body.appendChild(block);
+        if (count > SKILLS_PER_AREA) {
+            const li = make("li");
+            const more = button("dash-skill is-more", openArea);
+            more.textContent = `+${count - SKILLS_PER_AREA} more`;
+            more.setAttribute("aria-label", `${count - SKILLS_PER_AREA} more ${area.label} skills. Open in Skills`);
+            li.appendChild(more);
+            list.appendChild(li);
+        }
+        group.appendChild(list);
+        groups.appendChild(group);
     });
 
-    reveal(() => fills.forEach(fill => fill.classList.add("grown")));
+    body.append(bar, groups);
+    reveal(() => bar.classList.add("grown"));
 }
 
-function fillTimeline(body, timeline, tip, open, reveal) {
-    if (!timeline) {
+// --- totals table ------------------------------------------------------------
+
+// The donut's numbers as a table, with projects and the latest month of
+// each, then the two figures the line is about: busiest month and pace.
+function fillTotals(body, stats, focus, open) {
+    const latestOf = type => {
+        const months = stats.events.filter(event => event.type === type && event.month !== null).map(event => event.month);
+        return months.length ? monthLabel(Math.max(...months), true) : "–";
+    };
+
+    const table = make("table", "dash-totals");
+    const head = make("thead");
+    const headRow = make("tr");
+    headRow.append(make("th", null, "Type"), make("th", "is-num", "Count"), make("th", "is-num", "Latest"));
+    head.appendChild(headRow);
+
+    const rows = make("tbody");
+    const addRow = (key, label, count, onOpen) => {
+        const row = make("tr");
+        if (key !== "project") row.dataset.type = key;
+        const name = make("th");
+        name.scope = "row";
+        const link = button("dash-totals-link", onOpen);
+        link.append(swatch(TYPE_COLORS[key]), make("span", null, label));
+        if (key !== "project") bindFocus(link, focus, { type: key });
+        name.appendChild(link);
+        row.append(name, make("td", "is-num", String(count)), make("td", "is-num is-muted", latestOf(key)));
+        rows.appendChild(row);
+    };
+    stats.byType.forEach(type => addRow(type.key, type.label, type.count, () => open("myWorks", { tab: type.key })));
+    if (stats.projects > 0) addRow("project", "Projects", stats.projects, () => open("projects"));
+
+    const foot = make("tfoot");
+    const footRow = make("tr");
+    const totalLabel = make("th", null, "Total");
+    totalLabel.scope = "row";
+    footRow.append(totalLabel, make("td", "is-num", String(stats.works + stats.projects)), make("td"));
+    foot.appendChild(footRow);
+
+    table.append(head, rows, foot);
+
+    const facts = make("dl", "dash-facts");
+    if (stats.monthly) {
+        const { busiest, perMonth, byQuarter } = stats.monthly;
+        const fact = (term, value) => {
+            const group = make("div");
+            group.append(make("dt", null, term), make("dd", null, value));
+            facts.appendChild(group);
+        };
+        fact(byQuarter ? "Busiest quarter" : "Busiest month", `${busiest.fullLabel} · ${busiest.count}`);
+        fact("Average", `${perMonth.toFixed(1)} per month`);
+    }
+
+    body.append(table, facts);
+}
+
+// --- works per month: line ---------------------------------------------------
+
+function fillMonthly(body, monthly, tip, open, reveal) {
+    if (!monthly) {
         body.appendChild(make("p", "dash-empty", "Add a \"date\" to a work to see it here"));
         return;
     }
 
-    const { months } = timeline;
-    const max = Math.max(1, ...months.map(item => item.total));
-    const span = Math.max(months.length - 1, 1);
-    // Leaves room above the highest point for its label.
-    const x = i => (months.length === 1 ? 50 : (i / span) * 100);
-    const y = total => 100 - (total / max) * 70 - 4;
+    const { buckets } = monthly;
+    const max = Math.max(1, ...buckets.map(bucket => bucket.count));
+    const span = Math.max(buckets.length - 1, 1);
+    const x = i => (buckets.length === 1 ? 50 : (i / span) * 100);
+    // Room above the highest point for its value.
+    const y = count => 92 - (count / max) * 76;
 
-    const chart = make("div", "dash-timeline");
+    const chart = make("div", "dash-line-chart");
     const plot = make("div", "dash-plot");
 
-    // Running totals only change when something launches, so the line steps:
-    // flat through quiet months, straight up in a launch month.
-    let line = `M ${x(0)} ${y(months[0].total)}`;
-    months.forEach((item, i) => {
-        if (i === 0) return;
-        line += ` H ${x(i)} V ${y(item.total)}`;
-    });
-    if (months.length === 1) line = `M 0 ${y(months[0].total)} H 100`;
+    const points = buckets.map((bucket, i) => `${x(i)} ${y(bucket.count)}`);
+    const line = buckets.length === 1 ? `M 0 ${y(buckets[0].count)} H 100` : `M ${points.join(" L ")}`;
 
     const svg = makeSvg("svg", { viewBox: "0 0 100 100", preserveAspectRatio: "none", "aria-hidden": "true" });
-    [25, 50, 75].forEach(level => svg.appendChild(makeSvg("line", {
+    [y(max), y(max / 2)].forEach(level => svg.appendChild(makeSvg("line", {
         class: "dash-grid", x1: 0, x2: 100, y1: level, y2: level, "vector-effect": "non-scaling-stroke",
     })));
     svg.appendChild(makeSvg("line", {
-        class: "dash-baseline", x1: 0, x2: 100, y1: 96, y2: 96, "vector-effect": "non-scaling-stroke",
+        class: "dash-baseline", x1: 0, x2: 100, y1: 92, y2: 92, "vector-effect": "non-scaling-stroke",
     }));
-    svg.appendChild(makeSvg("path", { class: "dash-area-fill", d: `${line} V 96 H 0 Z` }));
+    svg.appendChild(makeSvg("path", { class: "dash-area-fill", d: `${line} V 92 H ${buckets.length === 1 ? 0 : x(0)} Z` }));
     svg.appendChild(makeSvg("path", { class: "dash-line", d: line, "vector-effect": "non-scaling-stroke" }));
-    const crosshair = makeSvg("line", { class: "dash-crosshair", x1: 0, x2: 0, y1: 0, y2: 96, "vector-effect": "non-scaling-stroke" });
+    const crosshair = makeSvg("line", { class: "dash-crosshair", x1: 0, x2: 0, y1: 0, y2: 92, "vector-effect": "non-scaling-stroke" });
     svg.appendChild(crosshair);
     plot.appendChild(svg);
 
-    const readout = item => {
-        const added = item.launches.map(launch => launch.name).join(", ");
-        return [`${item.total} total`, `${monthLabel(item.month, true)}${added ? ` · ${added}` : ""}`];
+    // The two gridlines are labelled on the left: the top count and half.
+    [max, max / 2].forEach(value => {
+        if (!Number.isInteger(value)) return;
+        const label = make("span", "dash-y-label", String(value));
+        label.style.top = `${y(value)}%`;
+        plot.appendChild(label);
+    });
+
+    const readout = bucket => {
+        if (bucket.count === 0) return ["0 works", bucket.fullLabel];
+        const names = bucket.names.slice(0, NAMES_IN_TIP).join(", ");
+        const rest = bucket.names.length - NAMES_IN_TIP;
+        return [`${bucket.count} ${plural(bucket.count, "work")}`, `${bucket.fullLabel} · ${names}${rest > 0 ? ` +${rest} more` : ""}`];
     };
 
-    // Launch months get a dot and a label naming what launched; both open it.
-    months.forEach((item, i) => {
-        if (item.launches.length === 0) return;
-        const edge = i === 0 ? "start" : i === months.length - 1 ? "end" : "middle";
+    // Set by buildDashboard once the items are known, so a point with one
+    // work opens that work exactly as its card does.
+    let pointTarget = () => ["myWorks", {}];
+    chart.setTargets = fn => (pointTarget = fn);
 
-        const dot = button("dash-point", () => open(...item.launches[0].target));
-        dot.tabIndex = -1; // the labels below are the keyboard targets
-        dot.setAttribute("aria-hidden", "true");
-        dot.style.left = `${x(i)}%`;
-        dot.style.top = `${y(item.total)}%`;
-        plot.appendChild(dot);
+    // A point per month: a button where something was made (it opens that
+    // work, or My Works when there were several), a quiet dot where not.
+    buckets.forEach((bucket, i) => {
+        const at = { left: `${x(i)}%`, top: `${y(bucket.count)}%` };
+        if (bucket.count === 0) {
+            const dot = make("span", "dash-point is-zero");
+            Object.assign(dot.style, at);
+            plot.appendChild(dot);
+            return;
+        }
 
-        const labels = make("div", `dash-point-labels at-${edge}`);
-        labels.style.left = `${x(i)}%`;
-        labels.style.top = `${y(item.total)}%`;
-        item.launches.forEach(launch => {
-            const label = button("dash-point-label", () => open(...launch.target));
-            label.append(make("span", "dash-point-name", launch.name), make("span", "dash-point-added", `+${launch.added}`));
-            label.setAttribute("aria-label", `${launch.name}, ${monthLabel(item.month, true)}, added ${launch.added}. Open it`);
-            bindTip(tip, label, () => readout(item));
-            labels.appendChild(label);
-        });
-        plot.appendChild(labels);
+        const single = bucket.names.length === 1 ? bucket.names[0] : null;
+        const point = button("dash-point", () => (single ? open(...pointTarget(single)) : open("myWorks")));
+        Object.assign(point.style, at);
+        point.dataset.works = bucket.names.join("|");
+        point.dataset.types = [...bucket.types].join(" ");
+        point.setAttribute("aria-label", `${readout(bucket).join(", ")}. Open`);
+        bindTip(tip, point, () => readout(bucket));
+        plot.appendChild(point);
+
+        // Only the peak carries its value; the rest are one hover away.
+        if (bucket === monthly.busiest) {
+            const value = make("span", "dash-point-value", String(bucket.count));
+            Object.assign(value.style, at);
+            plot.appendChild(value);
+        }
     });
 
     // The crosshair finds the month nearest the pointer anywhere in the plot.
     plot.addEventListener("pointermove", e => {
+        if (e.target.closest(".dash-point:not(.is-zero)")) return;
         const box = plot.getBoundingClientRect();
-        const i = Math.round(Math.min(Math.max((e.clientX - box.left) / box.width, 0), 1) * span);
-        const item = months[Math.min(i, months.length - 1)];
-        const at = x(Math.min(i, months.length - 1));
+        const i = Math.min(Math.round(Math.min(Math.max((e.clientX - box.left) / box.width, 0), 1) * span), buckets.length - 1);
+        const at = x(i);
         crosshair.setAttribute("x1", at);
         crosshair.setAttribute("x2", at);
         crosshair.classList.add("shown");
-        const [text, detail] = readout(item);
-        tip.show(text, detail, box.left + (at / 100) * box.width, box.top + (y(item.total) / 100) * box.height - 12);
+        const [text, detail] = readout(buckets[i]);
+        tip.show(text, detail, box.left + (at / 100) * box.width, box.top + (y(buckets[i].count) / 100) * box.height - 12);
     });
     plot.addEventListener("pointerleave", () => {
         crosshair.classList.remove("shown");
@@ -438,60 +796,84 @@ function fillTimeline(body, timeline, tip, open, reveal) {
     });
 
     const axis = make("div", "dash-axis");
-    months.forEach((item, i) => {
-        // Every month while they fit; past a year only every third one.
-        if (months.length > 12 && i % 3 !== 0 && i !== months.length - 1) return;
-        // Month names only - the start year sits in the card's corner - with
-        // the year added where a new one begins.
-        const tick = make("span", "dash-tick", monthLabel(item.month, item.month % 12 === 0));
+    // Thin the ticks to what the width can hold without crowding: a month
+    // name needs about 44px, a quarter with its year about 58px.
+    const room = Math.max(2, Math.floor((body.clientWidth || 600) / (monthly.byQuarter ? 58 : 44)));
+    const every = Math.ceil(buckets.length / room);
+    buckets.forEach((bucket, i) => {
+        if (i % every !== 0) return;
+        // The start year is in the panel's corner; a tick only adds the year
+        // where a new one begins.
+        const text = bucket.yearStart ? `${bucket.label} ${bucket.year}` : bucket.label;
+        const tick = make("span", "dash-tick", text);
         tick.style.left = `${x(i)}%`;
         if (i === 0) tick.classList.add("at-start");
-        if (i === months.length - 1 && months.length > 1) tick.classList.add("at-end");
+        if (i === buckets.length - 1 && buckets.length > 1) tick.classList.add("at-end");
         axis.appendChild(tick);
     });
 
     chart.append(plot, axis);
     body.appendChild(chart);
     reveal(() => chart.classList.add("drawn"));
+    return chart;
 }
 
-function fillFeatured(card, body, project, open) {
-    if (!project) {
-        card.remove();
-        return;
-    }
+// --- social media: held for later ---------------------------------------------
 
-    const link = button("dash-featured", () => open("projects"));
-    const colors = Array.isArray(project.colors) && project.colors.length ? project.colors : ["#004225", "#4A067D"];
-    link.style.setProperty("--project-stripe", `linear-gradient(90deg, ${colors.join(", ")})`);
+const CONTACTS_FILE = "Data/contacts.json";
 
-    const top = make("span", "dash-featured-top");
-    if (project.logo) {
-        const mark = make("img", "dash-featured-mark");
-        mark.src = project.logo;
-        mark.alt = "";
-        mark.addEventListener("error", () => mark.remove());
-        top.appendChild(mark);
-    }
-    const heading = make("span", "dash-featured-heading");
-    heading.appendChild(make("span", "dash-featured-name", project.name ?? ""));
-    const since = monthIndex(project.date);
-    if (since !== null) heading.appendChild(make("span", "dash-featured-since", `Since ${monthLabel(since, true)}`));
-    top.appendChild(heading);
+// Not built yet: a blurred sketch of what will live here (one row per channel
+// that has followers, from the Contacts data) under a note saying so. The
+// sketch carries no real numbers and is hidden from assistive tech; the note
+// is the content.
+function fillSocial(body) {
+    const preview = make("div", "dash-social-preview");
+    preview.setAttribute("aria-hidden", "true");
+    preview.inert = true;
 
-    link.append(top);
-    if (project.tagline) link.appendChild(make("span", "dash-featured-tagline", project.tagline));
-    link.appendChild(make("span", "dash-featured-stripe"));
-    const cta = make("span", "dash-featured-cta", "Open project");
-    cta.insertAdjacentHTML("beforeend", ARROW_ICON);
-    link.appendChild(cta);
+    const note = make("div", "dash-social-note");
+    const title = make("p", "dash-social-title", "Social stats are on the way");
+    const text = make("p", "dash-social-text", "This section is for future social media stats.");
+    note.append(title, text);
+    body.append(preview, note);
 
-    body.appendChild(link);
+    fetch(CONTACTS_FILE)
+        .then(response => response.json())
+        .then(data => {
+            const channels = Object.values(data ?? {}).filter(contact => ["Social", "Videos"].includes(contact?.type));
+            channels.forEach((contact, i) => {
+                const row = make("div", "dash-social-row");
+                const icon = make("img");
+                icon.src = contact.icon;
+                icon.alt = "";
+                icon.addEventListener("error", () => icon.remove());
+                const bar = make("span", "dash-social-bar");
+                bar.style.setProperty("--fill", `${88 - i * 21}%`);
+                bar.style.setProperty("--accent", contact.accent || "var(--dash-ink-2)");
+                row.append(icon, make("span", "dash-social-name", contact.soft_name ?? ""), bar, make("span", "dash-social-value", "0.0k"));
+                preview.appendChild(row);
+            });
+            const names = channels.map(contact => contact.soft_name).filter(Boolean);
+            if (names.length) {
+                const list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0];
+                text.textContent = `This section is for future social media stats: followers and views from ${list}.`;
+            }
+        })
+        .catch(() => {});
 }
 
 // --- the dashboard -----------------------------------------------------------
 
-// Builds the overview and returns its root right away; the numbers fill in
+function buildBlock(tag, className, title) {
+    const block = make(tag, className);
+    const head = make("header", "dash-block-head");
+    head.appendChild(make("h3", "dash-block-title", title));
+    const body = make("div", "dash-block-body");
+    block.append(head, body);
+    return { block, head, body };
+}
+
+// Builds the overview and returns its root right away; the content fills in
 // once the data files arrive. open(section, options) is portfolio.js's way
 // into a section: open("myWorks", { tab: "design", open: "Congix" }).
 export function buildDashboard(open) {
@@ -500,37 +882,42 @@ export function buildDashboard(open) {
     root.setAttribute("aria-label", "Portfolio overview");
     const tip = createTooltip(root);
 
-    // Charts animate in the first time the overview is on screen. Anything
-    // filled in later than that animates as soon as it is filled.
+    // The overview builds itself in once, the first time it is on screen:
+    // the cards unveil, the donut and the bar fill, the line draws. Anything
+    // filled in later plays as soon as it is filled.
     let live = false;
     const waiting = [];
     const reveal = fn => (live ? requestAnimationFrame(() => requestAnimationFrame(fn)) : waiting.push(fn));
+    if (!reducedMotion()) root.classList.add("will-reveal");
     const observer = new IntersectionObserver(entries => {
         if (!entries.some(entry => entry.isIntersecting)) return;
         observer.disconnect();
         live = true;
-        root.classList.add("is-live");
         requestAnimationFrame(() => requestAnimationFrame(() => waiting.splice(0).forEach(fn => fn())));
-    }, { threshold: 0.2 });
+    }, { threshold: 0.15 });
     observer.observe(root);
 
-    const intro = make("div", "dash-intro");
-    intro.append(
-        make("h2", "dash-intro-title", "Overview"),
-        make("p", "dash-intro-hint", "Click any number, chart or name to open it")
-    );
+    // One bar: the section's name and the sentence that sums it up.
+    const header = make("header", "dash-header");
+    const headline = make("p", "dash-headline");
+    header.append(make("h2", "dash-header-title", "Portfolio"), headline);
 
-    const kpis = make("div", "dash-kpis");
-    const worksKpi = buildKpi("Works", () => open("myWorks"));
-    const projectsKpi = buildKpi("Projects", () => open("projects"));
-    const skillsKpi = buildKpi("Skills", () => open("skills"));
-    const monthsKpi = buildKpi("Months building");
-    kpis.append(worksKpi.tile, projectsKpi.tile, skillsKpi.tile, monthsKpi.tile);
+    const carousel = buildBlock("section", "dash-carousel", "Latest works");
 
-    const donut = buildCard("dash-donut-card", "Works by type", "Opens the tab");
-    const skills = buildCard("dash-skills-card", "Skills by area", "Opens the skill");
-    const featured = buildCard("dash-featured-card", "Featured project");
-    const timeline = buildCard("dash-timeline-card", "Works & projects over time", "Running total");
+    const panel = make("div", "dash-panel");
+    const types = buildBlock("section", "dash-block dash-types", "Works by type");
+    const skills = buildBlock("section", "dash-block dash-skills", "Skills");
+    panel.append(types.block, skills.block);
+
+    const pace = buildBlock("section", "dash-pace", "Works per month");
+    const paceHint = make("span", "dash-block-hint");
+    pace.head.appendChild(paceHint);
+    const totals = make("div", "dash-totals-wrap");
+    const monthlyBody = make("div", "dash-monthly");
+    pace.body.append(totals, monthlyBody);
+
+    const social = buildBlock("section", "dash-social", "Social media");
+    fillSocial(social.body);
 
     const actions = make("nav", "dash-actions");
     actions.setAttribute("aria-label", "Portfolio sections");
@@ -541,26 +928,24 @@ export function buildDashboard(open) {
         actions.appendChild(action);
     });
 
-    root.append(intro, kpis, donut.card, skills.card, featured.card, timeline.card, actions);
+    root.append(header, carousel.block, panel, pace.block, social.block, actions);
 
     Promise.all([loadWorks(), loadProjects(), loadSkills()]).then(([works, projects, skillData]) => {
         const stats = summarize(works, projects, skillData);
+        const focus = createFocus(root, stats.items);
 
-        worksKpi.set(stats.works, stats.byType.map(type => `${type.label} ${type.count}`).join(" · ") || "None yet", reveal);
-        projectsKpi.set(stats.projects.length, stats.projects.map(project => project.name).join(" · ") || "None yet", reveal);
-        skillsKpi.set(stats.skills, stats.areas.map(area => `${area.label} ${area.skills.length}`).join(" · ") || "None yet", reveal);
-        if (stats.timeline) {
-            const first = stats.timeline.first;
-            monthsKpi.set(currentMonth() - first + 1, `Since ${monthLabel(first, true)}`, reveal);
-            timeline.card.querySelector(".dash-card-hint").textContent = `Running total since ${monthLabel(first, true)}`;
-        } else {
-            monthsKpi.set(0, "No dates yet", reveal);
-        }
-
-        fillDonut(donut.body, stats.byType, tip, open, reveal);
+        fillHeadline(headline, stats, open, reveal);
+        fillCarousel(carousel, stats.items, stats.works, focus, open, reveal);
+        fillDonut(types.body, stats.byType, tip, focus, open, reveal);
         fillSkills(skills.body, stats.areas, tip, open, reveal);
-        fillFeatured(featured.card, featured.body, stats.projects.find(project => project.pinned) ?? stats.projects[0], open);
-        fillTimeline(timeline.body, stats.timeline, tip, open, reveal);
+        fillTotals(totals, stats, focus, open);
+        const chart = fillMonthly(monthlyBody, stats.monthly, tip, open, reveal);
+        chart?.setTargets(name => stats.items.find(item => item.name === name)?.target ?? ["myWorks", {}]);
+        if (stats.monthly) {
+            paceHint.textContent = stats.monthly.byQuarter
+                ? `Per quarter since ${monthLabel(stats.monthly.first, true)}`
+                : `Since ${monthLabel(stats.monthly.first, true)}`;
+        }
     });
 
     return root;

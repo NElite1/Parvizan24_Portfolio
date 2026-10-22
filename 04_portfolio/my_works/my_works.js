@@ -419,6 +419,7 @@ export function loadWorks() {
                         ...entry,
                         type,
                         image: resolveAsset(entry.image, file),
+                        logo: resolveAsset(entry.logo, file),
                         images: Array.isArray(entry.images)
                             ? entry.images.map(src => resolveAsset(src, file))
                             : entry.images,

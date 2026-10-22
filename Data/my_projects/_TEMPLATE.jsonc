@@ -26,8 +26,8 @@
         "name": "Project name",
 
         // When the project started, as "YYYY-MM". The Portfolio overview uses
-        // it for the timeline chart. Leave it out and the project is still
-        // counted, just not placed on the timeline.
+        // it for its works-per-month chart. Leave it out and the project is
+        // still counted, just not placed on the chart.
         "date": "2026-10",
 
         // Small mark shown beside the title and on the switch button. Use a

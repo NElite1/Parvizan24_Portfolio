@@ -5,7 +5,6 @@ import { buildDashboard } from "./dashboard/dashboard.js";
 
 const portfolio = document.getElementById("portfolio");
 const portfolioContent = document.getElementById("portfolio-content");
-const portfolioLogo = document.getElementById('portfolio-websection-logo');
 
 // Each section's markup for #portfolio-active-content. My Works and Skills
 // carry their tab bars; Projects is one empty stage that my_projects.js fills.
@@ -60,8 +59,9 @@ function mountDashboard() {
     shellBuilt = false;
     transitioning = false;
 
-    if (portfolioLogo) portfolioLogo.hidden = false;
     portfolioContent.replaceChildren(buildDashboard(openSection));
+    // navbar.js keeps the bar hidden while the overview fills the screen.
+    document.dispatchEvent(new CustomEvent("portfolio:layer"));
 }
 
 function showDashboard() {
@@ -89,7 +89,6 @@ function bringPortfolioIntoView() {
 // section click. Later clicks keep this shell and only swap the content, so the
 // sidebar never re-renders and the content can animate its own way in/out.
 function buildShell() {
-    if (portfolioLogo) portfolioLogo.hidden = true;
     portfolioContent.innerHTML = `
         <div id="portfolio-content-activated">
             <div id="portfolio-navigation-activated">

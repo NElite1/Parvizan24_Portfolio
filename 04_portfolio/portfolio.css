@@ -47,32 +47,22 @@
     filter: blur(8px);
 }
 
-#portfolio-websection-logo{
+/* Drifting dots behind the portfolio, like the hero's and the contacts':
+   they fill the dark around the panels, which stay opaque above them. */
+#portfolio-particles{
   position:absolute;
-  top:50px;
-  left:50%;
-  display:flex;
-  flex-direction:row;
-  justify-content:center;
-  align-items:center;
-  width:150px;
-  background-color:var(--layer0);
-  height:30px;
-  border-width:0px;
-  border-radius:15px;
-  filter:
-     drop-shadow(0 0 5px var(--secondary-color))
-     drop-shadow(0 0 15px var(--secondary-color))
-    ;
-  transform: translateX(-50%);
+  inset:0;
+  z-index:0;
+  pointer-events:none;
 }
-#portfolio-websection-logo[hidden]{
-  display:none;
+#portfolio-particles canvas{
+  pointer-events:none !important;
 }
 #portfolio-content{
   display:flex;
   flex-direction:row;
   position:relative;
+  z-index:1;
   width:100%;
   height:95vh;
   min-height:570px;
@@ -87,6 +77,7 @@
 #portfolio:has(.portfolio-dashboard){
   height:auto;
   min-height:100vh;
+  justify-content:center;
 }
 #portfolio-content:has(> .portfolio-dashboard){
   height:auto;

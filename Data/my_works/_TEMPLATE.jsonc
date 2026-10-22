@@ -21,7 +21,8 @@
 
 [
     {
-        // Thumbnail shown on the line/grid list.
+        // Thumbnail shown on the line/grid list, and the picture on the
+        // work's card in the Portfolio overview's "Latest works" carousel.
         //   - A URL or path (contains "/" or ".") renders as a real image
         //     that fills its frame, e.g. "../work_photos/site.png"
         //   - Plain text (no "/" or ".") just shows as text - handy as a
@@ -51,9 +52,15 @@
         // Title of the work.
         "name": "Project name",
 
+        // Small square mark of the work (its logo or app icon), same path
+        // rules as "image". The Portfolio overview shows it beside the work's
+        // name on its carousel card; leave it out for the name alone.
+        "logo": "../work_photos/example_mark.png",
+
         // When the work was made, as "YYYY-MM". The Portfolio overview uses
-        // it for the timeline chart. Leave it out and the work is still
-        // counted, just not placed on the timeline.
+        // it to pick the newest works and for its works-per-month chart.
+        // Leave it out and the work is still counted, just not placed on the
+        // chart (and it goes to the end of the carousel).
         "date": "2026-05",
 
         // SHORT text - shown on the line/grid list (keep it one line-ish).
