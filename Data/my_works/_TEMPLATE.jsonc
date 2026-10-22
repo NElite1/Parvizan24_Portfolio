@@ -51,6 +51,11 @@
         // Title of the work.
         "name": "Project name",
 
+        // When the work was made, as "YYYY-MM". The Portfolio overview uses
+        // it for the timeline chart. Leave it out and the work is still
+        // counted, just not placed on the timeline.
+        "date": "2026-05",
+
         // SHORT text - shown on the line/grid list (keep it one line-ish).
         "description": "One sentence about the work.",
 

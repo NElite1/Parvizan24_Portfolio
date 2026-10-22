@@ -1,0 +1,721 @@
+/* Portfolio overview: the first layer of #portfolio, before any section is
+   opened. Built by dashboard.js. Every clickable thing in here opens the
+   section it counts. */
+
+.portfolio-dashboard{
+    /* Chart colours. A colour belongs to its work type / skill area, so
+       Design is violet in every chart. Picked for the #141414 cards and
+       checked for colour-blind separation. */
+    --dash-design:#9085e9;
+    --dash-programming:#199e70;
+    --dash-engineering:#d95926;
+    /* The single timeline series: the logo's yellow. */
+    --dash-accent:#FFBB00;
+
+    --dash-card:#141414;
+    --dash-raised:#252525;
+    --dash-ink:#ffffff;
+    --dash-ink-2:#c3c2b7;
+    --dash-muted:#898781;
+    --dash-grid:#2c2c2a;
+    --dash-axis:#383835;
+    --dash-green:#00A85C;
+
+    position:relative;
+    align-self:stretch;
+    width:min(1240px, calc(100% - 50px));
+    /* Fills the section on tall screens; on short ones it grows and the
+       section grows with it (see portfolio.css). */
+    min-height:max(95vh, 570px);
+    margin:0 auto;
+    box-sizing:border-box;
+    /* Top room for the "Portfolio" pill that floats above. */
+    padding:72px 0 22px;
+
+    display:grid;
+    grid-template-columns:repeat(12, minmax(0, 1fr));
+    grid-template-rows:auto auto minmax(230px, 1.15fr) minmax(190px, 1fr) auto;
+    gap:14px;
+
+    color:var(--dash-ink);
+    font-family:Inter, sans-serif;
+
+    animation:dash-in .4s ease both;
+}
+@keyframes dash-in{
+    from{ opacity:0; transform:translateY(12px); }
+    to{ opacity:1; transform:none; }
+}
+
+/* :where() keeps this at zero specificity, so each button's own size wins. */
+:where(.portfolio-dashboard) button{
+    font:inherit;
+    color:inherit;
+    cursor:pointer;
+}
+.portfolio-dashboard :focus-visible{
+    outline:2px solid #A06BEE;
+    outline-offset:3px;
+}
+
+/* Heading row -------------------------------------------------------------- */
+.dash-intro{
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:16px;
+    padding:0 4px;
+}
+.dash-intro-title{
+    font-size:1.25rem;
+    font-weight:600;
+}
+.dash-intro-hint{
+    margin:0;
+    color:var(--dash-muted);
+    font-size:.82rem;
+}
+
+/* Cards -------------------------------------------------------------------- */
+.dash-card{
+    position:relative;
+    min-width:0;
+    min-height:0;
+    box-sizing:border-box;
+    padding:16px 18px;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    background:var(--dash-card);
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.05);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.45),
+        0 4px 10px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 -1px 0 rgba(0,0,0,.45);
+
+    text-align:left;
+    transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.dash-card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+}
+.dash-card-title{
+    display:block;
+    font-size:.95rem;
+    font-weight:600;
+    letter-spacing:0;
+}
+.dash-card-hint{
+    color:var(--dash-muted);
+    font-size:.75rem;
+    white-space:nowrap;
+}
+.dash-card-body{
+    flex:1;
+    min-height:0;
+    display:flex;
+}
+.dash-empty{
+    margin:auto;
+    color:var(--dash-muted);
+    font-size:.85rem;
+}
+
+/* Number tiles ------------------------------------------------------------- */
+.dash-kpis{
+    grid-column:1 / -1;
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+    gap:14px;
+}
+.dash-kpi{
+    gap:2px;
+    padding:14px 18px 16px;
+}
+button.dash-kpi:hover{
+    border-color:rgba(0,168,92,.5);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.45),
+        0 0 24px -8px var(--dash-green),
+        inset 0 1px 0 rgba(255,255,255,.08);
+}
+.dash-kpi-label{
+    color:var(--dash-ink-2);
+    font-size:.78rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+}
+.dash-kpi-value{
+    font-size:2.6rem;
+    font-weight:600;
+    line-height:1.1;
+    letter-spacing:-.04em;
+}
+.dash-kpi-note{
+    overflow:hidden;
+    color:var(--dash-muted);
+    font-size:.78rem;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.dash-arrow{
+    width:18px;
+    height:18px;
+    flex-shrink:0;
+    transition:translate .3s cubic-bezier(.16, 1, .3, 1);
+}
+.dash-kpi .dash-arrow{
+    position:absolute;
+    top:14px;
+    right:14px;
+    color:var(--dash-muted);
+}
+.dash-kpi:hover .dash-arrow{
+    color:var(--dash-green);
+    translate:3px -3px;
+}
+
+/* Works by type: donut ----------------------------------------------------- */
+.dash-donut-card{
+    grid-column:span 4;
+}
+.dash-donut-card .dash-card-body{
+    align-items:center;
+    gap:20px;
+}
+.dash-donut{
+    position:relative;
+    flex-shrink:0;
+    width:clamp(120px, 48%, 180px);
+    max-height:100%;
+    aspect-ratio:1;
+}
+.dash-donut svg{
+    display:block;
+    width:100%;
+    height:100%;
+}
+.dash-donut-track,
+.dash-donut-slice{
+    fill:none;
+    stroke-width:13;
+}
+.dash-donut-track{
+    stroke:rgba(255,255,255,.05);
+}
+.dash-donut-slice{
+    cursor:pointer;
+    stroke-linecap:butt;
+    transition:stroke-dasharray 1s cubic-bezier(.16, 1, .3, 1), opacity .2s ease;
+}
+.dash-donut-slice.dimmed{
+    opacity:.3;
+}
+.dash-donut-center{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    pointer-events:none;
+}
+.dash-donut-total{
+    font-size:2rem;
+    font-weight:600;
+    line-height:1;
+    letter-spacing:-.04em;
+}
+.dash-donut-unit{
+    color:var(--dash-muted);
+    font-size:.78rem;
+}
+
+.dash-legend{
+    flex:1;
+    min-width:0;
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+.dash-legend-item{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    transition:background-color .2s ease;
+}
+.dash-legend-item:hover{
+    background:rgba(255,255,255,.05);
+}
+.dash-swatch{
+    width:10px;
+    height:10px;
+    flex-shrink:0;
+    border-radius:3px;
+}
+.dash-legend-label{
+    flex:1;
+    min-width:0;
+    color:var(--dash-ink-2);
+    font-size:.88rem;
+    text-align:left;
+}
+.dash-legend-value{
+    font-size:.95rem;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+}
+
+/* Skills by area: bars ----------------------------------------------------- */
+.dash-skills-card{
+    grid-column:span 4;
+}
+.dash-skills-card .dash-card-body{
+    flex-direction:column;
+    justify-content:center;
+    gap:16px;
+}
+.dash-area{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+.dash-bar-row{
+    display:grid;
+    grid-template-columns:96px minmax(0, 1fr) 24px;
+    align-items:center;
+    gap:12px;
+    padding:6px 8px;
+    margin:0 -8px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    transition:background-color .2s ease;
+}
+.dash-bar-row:hover{
+    background:rgba(255,255,255,.05);
+}
+.dash-bar-label{
+    color:var(--dash-ink-2);
+    font-size:.88rem;
+    text-align:left;
+}
+.dash-bar-track{
+    height:12px;
+    border-radius:4px;
+    background:rgba(255,255,255,.05);
+    overflow:hidden;
+}
+.dash-bar-fill{
+    display:block;
+    width:calc(var(--share) * 100%);
+    height:100%;
+    border-radius:0 4px 4px 0;
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .9s cubic-bezier(.16, 1, .3, 1);
+}
+.dash-bar-fill.grown{
+    transform:scaleX(1);
+}
+.dash-bar-value{
+    font-size:.95rem;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+    text-align:right;
+}
+.dash-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+.dash-chip{
+    padding:5px 11px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:999px;
+    background:var(--dash-raised);
+    color:var(--dash-ink-2);
+    font-size:.76rem;
+    transition:border-color .2s ease, color .2s ease;
+}
+.dash-chip:hover{
+    border-color:var(--dash-green);
+    color:var(--dash-ink);
+}
+
+/* Featured project --------------------------------------------------------- */
+.dash-featured-card{
+    grid-column:span 4;
+}
+.dash-featured{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:14px;
+    padding:0;
+    border:0;
+    background:transparent;
+    text-align:left;
+}
+.dash-featured-top{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+.dash-featured-mark{
+    width:48px;
+    height:48px;
+    object-fit:contain;
+}
+.dash-featured-heading{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+.dash-featured-name{
+    font-size:1.35rem;
+    font-weight:600;
+    letter-spacing:-.03em;
+}
+.dash-featured-since{
+    color:var(--dash-muted);
+    font-size:.78rem;
+}
+.dash-featured-tagline{
+    color:var(--dash-ink-2);
+    font-size:.92rem;
+    line-height:1.45;
+}
+/* The project's own colours, as a thin ribbon. Decoration, not data. */
+.dash-featured-stripe{
+    height:4px;
+    border-radius:4px;
+    background:var(--project-stripe);
+}
+.dash-featured-cta{
+    align-self:flex-start;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 16px 9px 18px;
+    border:1px solid var(--dash-green);
+    border-radius:999px;
+    background:#07301F;
+    font-size:.88rem;
+    font-weight:600;
+    transition:background-color .2s ease, box-shadow .2s ease;
+}
+.dash-featured:hover .dash-featured-cta{
+    background:#0A4A2F;
+    box-shadow:0 10px 24px -10px var(--dash-green);
+}
+.dash-featured:hover .dash-arrow{
+    translate:3px -3px;
+}
+
+/* Timeline ----------------------------------------------------------------- */
+.dash-timeline-card{
+    grid-column:1 / -1;
+}
+.dash-timeline{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    /* Keeps the first and last labels off the card's edges. */
+    padding:0 6px;
+}
+.dash-plot{
+    position:relative;
+    flex:1;
+    min-height:110px;
+}
+.dash-plot svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:visible;
+}
+.dash-grid{
+    stroke:var(--dash-grid);
+    stroke-width:1;
+}
+.dash-baseline{
+    stroke:var(--dash-axis);
+    stroke-width:1;
+}
+.dash-line{
+    fill:none;
+    stroke:var(--dash-accent);
+    stroke-width:2;
+    stroke-linejoin:round;
+}
+.dash-area-fill{
+    fill:var(--dash-accent);
+    opacity:.08;
+}
+.dash-line,
+.dash-area-fill{
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path 1.2s cubic-bezier(.65, 0, .35, 1);
+}
+.dash-timeline.drawn .dash-line,
+.dash-timeline.drawn .dash-area-fill{
+    clip-path:inset(0 0 0 0);
+}
+.dash-crosshair{
+    stroke:rgba(255,255,255,.28);
+    stroke-width:1;
+    opacity:0;
+    transition:opacity .15s ease;
+}
+.dash-crosshair.shown{
+    opacity:1;
+}
+
+/* A 24px hit area around a 10px dot ringed in the card colour. */
+.dash-point{
+    position:absolute;
+    width:24px;
+    height:24px;
+    padding:0;
+    border:0;
+    background:transparent;
+    transform:translate(-50%, -50%);
+}
+.dash-point::before{
+    content:"";
+    position:absolute;
+    inset:7px;
+    border-radius:50%;
+    background:var(--dash-accent);
+    box-shadow:0 0 0 2px var(--dash-card);
+    transition:transform .2s ease;
+}
+.dash-point:hover::before{
+    transform:scale(1.3);
+}
+.dash-point-labels{
+    position:absolute;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transform:translate(-50%, calc(-100% - 10px));
+}
+.dash-point-labels.at-start{
+    align-items:flex-start;
+    transform:translate(-8px, calc(-100% - 10px));
+}
+.dash-point-labels.at-end{
+    align-items:flex-end;
+    transform:translate(calc(-100% + 8px), calc(-100% - 10px));
+}
+.dash-point,
+.dash-point-labels{
+    opacity:0;
+    transition:opacity .4s ease .9s;
+}
+.dash-timeline.drawn .dash-point,
+.dash-timeline.drawn .dash-point-labels{
+    opacity:1;
+}
+.dash-point-label{
+    display:inline-flex;
+    align-items:baseline;
+    gap:5px;
+    padding:2px 6px;
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    font-size:.8rem;
+    white-space:nowrap;
+}
+.dash-point-label:hover{
+    background:rgba(255,255,255,.06);
+}
+.dash-point-name{
+    font-weight:600;
+}
+.dash-point-added{
+    color:var(--dash-muted);
+    font-size:.72rem;
+}
+.dash-axis{
+    position:relative;
+    height:16px;
+}
+.dash-tick{
+    position:absolute;
+    top:0;
+    transform:translateX(-50%);
+    color:var(--dash-muted);
+    font-size:.72rem;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+}
+.dash-tick.at-start{
+    transform:none;
+}
+.dash-tick.at-end{
+    transform:translateX(-100%);
+}
+
+/* Tooltip ------------------------------------------------------------------ */
+.dash-tooltip{
+    position:absolute;
+    z-index:30;
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    padding:7px 11px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;
+    background:var(--dash-raised);
+    box-shadow:0 10px 24px rgba(0,0,0,.5);
+    pointer-events:none;
+    white-space:nowrap;
+    opacity:0;
+    transform:translate(-50%, calc(-100% - 8px));
+    transition:opacity .12s ease;
+}
+.dash-tooltip.shown{
+    opacity:1;
+}
+.dash-tooltip-value{
+    font-size:.92rem;
+    font-weight:600;
+}
+.dash-tooltip-label{
+    color:var(--dash-ink-2);
+    font-size:.75rem;
+}
+
+/* Section buttons ---------------------------------------------------------- */
+.dash-actions{
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:14px;
+}
+.dash-action{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 20px 12px 22px;
+    border:1px solid var(--dash-green);
+    border-radius:999px;
+    background:#07301F;
+    font-size:.95rem;
+    font-weight:600;
+    transition:background-color .2s ease, box-shadow .2s ease;
+}
+.dash-action:hover{
+    background:#0A4A2F;
+    box-shadow:0 10px 24px -10px var(--dash-green);
+}
+.dash-action:hover .dash-arrow{
+    translate:3px -3px;
+}
+
+/* Tablet: two columns, the page grows to fit -------------------------------- */
+@media (max-width:1024px){
+    .portfolio-dashboard{
+        width:calc(100% - 30px);
+        min-height:0;
+        grid-template-rows:none;
+        padding-top:68px;
+    }
+    .dash-kpi-value{
+        font-size:2.1rem;
+    }
+    .dash-donut-card,
+    .dash-skills-card{
+        grid-column:span 6;
+        min-height:240px;
+    }
+    .dash-featured-card,
+    .dash-timeline-card{
+        grid-column:1 / -1;
+    }
+    .dash-timeline-card{
+        min-height:230px;
+    }
+}
+
+/* Phone: one column -------------------------------------------------------- */
+@media (max-width:680px){
+    .portfolio-dashboard{
+        width:calc(100% - 32px);
+        grid-template-columns:minmax(0, 1fr);
+        gap:12px;
+        padding:92px 0 40px;
+    }
+    .dash-intro,
+    .dash-card-head{
+        flex-direction:column;
+        gap:2px;
+    }
+    .dash-kpis{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:12px;
+    }
+    .dash-kpi-value{
+        font-size:1.9rem;
+    }
+    /* Two half-width tiles leave no room for one line - wrap instead of
+       cutting the note off. */
+    .dash-kpi-note{
+        white-space:normal;
+    }
+    .dash-donut-card,
+    .dash-skills-card,
+    .dash-featured-card,
+    .dash-timeline-card{
+        grid-column:1 / -1;
+        min-height:0;
+    }
+    .dash-donut{
+        width:132px;
+    }
+    .dash-timeline-card{
+        min-height:220px;
+    }
+    .dash-actions{
+        flex-direction:column;
+        align-items:stretch;
+        gap:10px;
+    }
+    .dash-action{
+        justify-content:center;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .portfolio-dashboard,
+    .portfolio-dashboard *{
+        animation:none !important;
+        transition-duration:.01s !important;
+        transition-delay:0s !important;
+    }
+}

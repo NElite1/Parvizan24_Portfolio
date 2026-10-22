@@ -1,7 +1,9 @@
 import { initMyWorks } from "./my_works/my_works.js";
 import { initProjects } from "./my_projects/my_projects.js";
 import { initSkills } from "./skills/skills.js";
+import { buildDashboard } from "./dashboard/dashboard.js";
 
+const portfolio = document.getElementById("portfolio");
 const portfolioContent = document.getElementById("portfolio-content");
 const portfolioLogo = document.getElementById('portfolio-websection-logo');
 
@@ -48,11 +50,46 @@ let activeSection = null;
 let shellBuilt = false;
 let transitioning = false;
 
+// The first layer: the overview dashboard. Shown on load and again whenever
+// the sidebar's Overview button is pressed - that tears the activated shell
+// down, so the next section click builds it fresh.
+function mountDashboard() {
+    if (!portfolioContent) return;
+
+    activeSection = null;
+    shellBuilt = false;
+    transitioning = false;
+
+    if (portfolioLogo) portfolioLogo.hidden = false;
+    portfolioContent.replaceChildren(buildDashboard(openSection));
+}
+
+function showDashboard() {
+    mountDashboard();
+    bringPortfolioIntoView();
+}
+
+// Entry point for everything on the dashboard: a section, optionally on one of
+// its tabs ({ tab: "design" }) and with one item opened ({ open: "Congix" }).
+function openSection(name, options = {}) {
+    renderPortfolio(name, options);
+    bringPortfolioIntoView();
+}
+
+// The dashboard can be taller than the screen (phones), the activated shell
+// never is. When switching between the two leaves the top of the section
+// scrolled away, bring it back so the new layer starts in view.
+function bringPortfolioIntoView() {
+    if (portfolio && portfolio.getBoundingClientRect().top < 0) {
+        portfolio.scrollIntoView({ block: "start" });
+    }
+}
+
 // Builds the activated layout (sidebar + empty content area) once, on the first
 // section click. Later clicks keep this shell and only swap the content, so the
 // sidebar never re-renders and the content can animate its own way in/out.
 function buildShell() {
-    if (portfolioLogo) portfolioLogo.remove();
+    if (portfolioLogo) portfolioLogo.hidden = true;
     portfolioContent.innerHTML = `
         <div id="portfolio-content-activated">
             <div id="portfolio-navigation-activated">
@@ -60,6 +97,11 @@ function buildShell() {
                 <div id="portfolio-websection-logo-activated">
                   <h3>Portfolio</h3>
                 </div>
+
+                <button type="button" class="portfolio-overview-activated" id="portfolioOverview">
+                    <img src="icons/Grid.png" alt="" class="portfolio-overview-icon">
+                    <h3>Overview</h3>
+                </button>
 
                 <div class="portfolio-section-activated" id="myWorks">
                     <img src="icons/Cube.png" alt="My Works" class="portfolio-section-icon-activated">
@@ -97,10 +139,18 @@ function updateClicked(active) {
     });
 }
 
-function makeSlide(name) {
+function makeSlide(name, options = {}) {
     const slide = document.createElement("div");
     slide.className = "section-content";
     slide.innerHTML = ACTIVE_CONTENT[name] ?? "";
+
+    // Start on the asked-for tab instead of the first one. Both tabbed
+    // sections open on whichever tab is marked active when they initialise.
+    if (options.tab) {
+        const tabs = [...slide.querySelectorAll(".works_section")];
+        const pick = tabs.find(tab => tab.textContent.trim().toLowerCase() === options.tab);
+        if (pick) tabs.forEach(tab => tab.classList.toggle("active", tab === pick));
+    }
 
     // Projects is built the moment its slide exists rather than after the
     // slide lands: it works on its own slide only (no ids, nothing shared), so
@@ -112,18 +162,18 @@ function makeSlide(name) {
 
 // My Works and Skills find their markup by id, so they can only be set up once
 // their slide is the only one left in the DOM. Projects is done in makeSlide.
-function initSection(name) {
-    if (name === "myWorks") initMyWorks();
-    if (name === "skills") initSkills();
+function initSection(name, options = {}) {
+    if (name === "myWorks") initMyWorks(options);
+    if (name === "skills") initSkills(options);
 }
 
 // First-ever activation: nothing to slide from, so just drop the section in.
-function firstMount(active) {
+function firstMount(active, options) {
     const container = document.getElementById("portfolio-active-content");
 
     const strip = document.createElement("div");
     strip.className = "section-strip intro";
-    strip.appendChild(makeSlide(active));
+    strip.appendChild(makeSlide(active, options));
     container.replaceChildren(strip);
 
     strip.addEventListener("animationend", e => {
@@ -131,10 +181,10 @@ function firstMount(active) {
     }, { once: true });
 
     activeSection = active;
-    initSection(active);
+    initSection(active, options);
 }
 
-function renderPortfolio(active) {
+function renderPortfolio(active, options = {}) {
     if (!portfolioContent) return;
     if (active === activeSection) return;
     if (transitioning) return; // let the current slide finish before the next
@@ -148,14 +198,14 @@ function renderPortfolio(active) {
         ?.classList.toggle("dock-shown", active === "myWorks");
 
     if (activeSection === null) {
-        firstMount(active);
+        firstMount(active, options);
         return;
     }
 
     const container = document.getElementById("portfolio-active-content");
     const oldStrip = container.querySelector(".section-strip");
     if (!oldStrip) {
-        firstMount(active);
+        firstMount(active, options);
         return;
     }
 
@@ -175,7 +225,8 @@ function renderPortfolio(active) {
 
     const currentSlide = oldStrip.firstElementChild;
     for (let i = lo; i <= hi; i++) {
-        strip.appendChild(i === from ? currentSlide : makeSlide(ORDER[i]));
+        if (i === from) strip.appendChild(currentSlide);
+        else strip.appendChild(makeSlide(ORDER[i], i === to ? options : {}));
     }
 
     container.replaceChildren(strip);
@@ -202,12 +253,15 @@ function renderPortfolio(active) {
 
         activeSection = active;
         transitioning = false;
-        initSection(active);
+        initSection(active, options);
     };
     strip.addEventListener("transitionend", onDone);
 }
 
 function addPortfolioListeners() {
+    document.getElementById("portfolioOverview")
+        ?.addEventListener("click", showDashboard);
+
     document.getElementById("myWorks")
         ?.addEventListener("click", () => renderPortfolio("myWorks"));
 
@@ -218,5 +272,4 @@ function addPortfolioListeners() {
         ?.addEventListener("click", () => renderPortfolio("skills"));
 }
 
-// Attach listeners to the INITIAL buttons already in the HTML
-addPortfolioListeners();
+mountDashboard();

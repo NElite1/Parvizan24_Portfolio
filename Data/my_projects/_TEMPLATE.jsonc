@@ -25,6 +25,11 @@
         // Title of the project - the big heading.
         "name": "Project name",
 
+        // When the project started, as "YYYY-MM". The Portfolio overview uses
+        // it for the timeline chart. Leave it out and the project is still
+        // counted, just not placed on the timeline.
+        "date": "2026-10",
+
         // Small mark shown beside the title and on the switch button. Use a
         // square image with a transparent background. Leave "" for none.
         "logo": "../work_photos/example_mark.webp",

@@ -399,9 +399,9 @@ function sectionIndex(item) {
 // of each firing their own.
 let worksDataPromise = null;
 
-async function loadWorksData() {
-    if (worksData.length > 0) return;
-
+// Every work from every tab file, each tagged with its type. Exported so the
+// Portfolio overview counts from the same request this section renders from.
+export function loadWorks() {
     // Fetch every tab's file in parallel and tag each entry with its type
     // (taken from the file it came from). A missing or empty file just means
     // that tab has no works yet - it shows the empty state instead of failing.
@@ -430,7 +430,12 @@ async function loadWorksData() {
             )
         ).then(results => results.flat());
     }
-    worksData = await worksDataPromise;
+    return worksDataPromise;
+}
+
+async function loadWorksData() {
+    if (worksData.length > 0) return;
+    worksData = await loadWorks();
 }
 
 function setActive(target) {
@@ -480,7 +485,11 @@ function moveSliderTo(target) {
 // fresh copy of the markup) - it re-queries every element, resets the panel
 // cache (the old panels belonged to a now-discarded subtree), and reattaches
 // every listener from scratch.
-export async function initMyWorks() {
+//
+// open: the name of a work to show in its detail overlay straight away (the
+// overview links to single works). It is looked up in the tab that starts
+// active, which portfolio.js has already picked.
+export async function initMyWorks({ open } = {}) {
     myWorkContainer = document.querySelector(".my-work");
     if (!myWorkContainer) return;
 
@@ -636,5 +645,12 @@ export async function initMyWorks() {
 
     await loadWorksData();
     if (token !== initToken) return; // a newer initMyWorks() call has since taken over
-    if (initialActive) showTab(initialActive.textContent, 0, true);
+    if (!initialActive) return;
+    showTab(initialActive.textContent, 0, true);
+
+    if (open) {
+        const type = initialActive.textContent.trim().toLowerCase();
+        const entry = worksData.find(item => item.type === type && item.name === open);
+        if (entry) openWorkDetail(entry);
+    }
 }

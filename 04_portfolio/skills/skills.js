@@ -138,17 +138,31 @@ function moveSliderTo(target) {
     if (Math.round(currentLeft) === Math.round(newLeft)) slider.classList.remove("moving");
 }
 
+let skillsPromise = null;
+
+// skills.json as it is in the file. Exported so the Portfolio overview counts
+// from the same request this section renders from.
+export function loadSkills() {
+    if (!skillsPromise) {
+        skillsPromise = fetch("Data/skills.json")
+            .then(response => response.json())
+            .catch(() => ({}));
+    }
+    return skillsPromise;
+}
+
 async function loadSkillsData() {
     if (Object.keys(skillsData).length > 0) return;
-
-    const response = await fetch("Data/skills.json");
-    skillsData = await response.json();
+    skillsData = await loadSkills();
 }
 
 // Sets up the Skills section against whatever markup portfolio.js just injected.
 // Safe to call more than once - it re-queries every element and reattaches
 // every listener from scratch.
-export async function initSkills() {
+//
+// open: the name of a skill to show in its detail overlay straight away,
+// looked up in the tab that starts active (portfolio.js picks that tab).
+export async function initSkills({ open } = {}) {
     skillsContainer = document.querySelector(".my-work");
     if (!skillsContainer) return;
 
@@ -231,5 +245,13 @@ export async function initSkills() {
     }
 
     await loadSkillsData();
-    if (initialActive) showTab(initialActive.textContent);
+    if (!initialActive) return;
+    showTab(initialActive.textContent);
+
+    if (open) {
+        // Names in skills.json carry stray trailing spaces - compare trimmed.
+        const entry = entriesForCategory(categoryFromLabel(initialActive.textContent))
+            .find(item => (item.name ?? "").trim() === open.trim());
+        if (entry) openDetail(entry);
+    }
 }

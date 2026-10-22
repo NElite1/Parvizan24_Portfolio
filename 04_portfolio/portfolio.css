@@ -66,6 +66,9 @@
     ;
   transform: translateX(-50%);
 }
+#portfolio-websection-logo[hidden]{
+  display:none;
+}
 #portfolio-content{
   display:flex;
   flex-direction:row;
@@ -79,32 +82,14 @@
   align-items:center;
 }
 
-.portfolio-section{
-    width:250px;
-    height:250px;
-    display:flex;
-    flex-direction:column;
-    justify-content: center;
-    align-items: center;
-    background-color:var(--layer0);
-    border-width:0px;
-    border-radius:15px;
-    filter:
-        drop-shadow(0 0 5px var(--secondary-color))
-        drop-shadow(0 0 15px var(--secondary-color))
-    ;
-    transition: hover, 0.2s;
+/* The overview dashboard can be taller than the screen (short laptops,
+   tablets, phones): let the section grow around it instead of clipping. */
+#portfolio:has(.portfolio-dashboard){
+  height:auto;
+  min-height:100vh;
 }
-.portfolio-section-icon{
-    width:200px;
-    height:200px;
-}
-.portfolio-section:hover{
-    width:275px;
-    height:275px;
-    filter:
-        drop-shadow(0 0 5px var(--main-color))
-        drop-shadow(0 0 15px var(--main-color))
+#portfolio-content:has(> .portfolio-dashboard){
+  height:auto;
 }
 
 
@@ -207,6 +192,35 @@
     width:80px;
     height:80px;
 }
+/* Back to the overview dashboard: a slim button above the section cards. */
+.portfolio-overview-activated{
+    width:115px;
+    height:44px;
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    padding:0;
+    background-color:#252525;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    color:var(--text);
+    cursor:pointer;
+    transition:border-color .2s ease, box-shadow .2s ease;
+}
+.portfolio-overview-activated:hover{
+    border-color:rgba(0,168,92,.6);
+    box-shadow:0 0 18px -6px #00A85C;
+}
+.portfolio-overview-activated:focus-visible{
+    outline:2px solid #A06BEE;
+    outline-offset:3px;
+}
+.portfolio-overview-icon{
+    width:18px;
+    height:18px;
+}
 .portfolio-section-clicked{
     width:125px;
     height:125px;
@@ -272,19 +286,6 @@
 
 /* Tablet: identical layout, every block one step smaller ------------------- */
 @media (max-width:1024px){
-    .portfolio-section{
-        width:170px;
-        height:170px;
-    }
-    .portfolio-section-icon{
-        width:126px;
-        height:126px;
-    }
-    .portfolio-section:hover{
-        width:188px;
-        height:188px;
-    }
-
     #portfolio-navigation-activated{
         width:112px;
         margin:0 15px;
@@ -306,9 +307,17 @@
         width:96px;
         height:104px;
     }
+    .portfolio-overview-activated{
+        width:88px;
+        height:40px;
+        gap:6px;
+    }
+    .portfolio-overview-activated h3{
+        font-size:0.78rem;
+    }
 }
 
-/* Phone: idle cards stack; the sidebar becomes a top bar -------------------- */
+/* Phone: the sidebar becomes a bottom tab bar ------------------------------- */
 @media (max-width:680px){
     #portfolio{
         height:auto;
@@ -316,31 +325,9 @@
     }
     #portfolio-content{
         flex-direction:column;
-        justify-content:center;
-        gap:35px;
-        height:auto;
-        min-height:100vh;
-        box-sizing:border-box;
-        padding:100px 0 60px;
-    }
-    /* That padding is for the idle stacked cards only - once the activated
-       shell is mounted inside the same container, drop it. */
-    #portfolio-content:has(> #portfolio-content-activated){
-        padding:0;
-        min-height:0;
         justify-content:flex-start;
-    }
-    .portfolio-section{
-        width:140px;
-        height:140px;
-    }
-    .portfolio-section-icon{
-        width:100px;
-        height:100px;
-    }
-    .portfolio-section:hover{
-        width:140px;
-        height:140px;
+        height:auto;
+        min-height:0;
     }
 
     /* Activated: navigation moves to the top, content fills the rest. */
@@ -392,8 +379,21 @@
         width:82px;
         height:66px;
     }
-    .portfolio-section-activated h3{
+    .portfolio-section-activated h3,
+    .portfolio-overview-activated h3{
         font-size:0.7rem;
+    }
+    /* In the tab bar Overview is a tab like the others: icon over label. */
+    .portfolio-overview-activated{
+        flex-direction:column;
+        gap:4px;
+        width:70px;
+        height:66px;
+        border-radius:15px;
+    }
+    .portfolio-overview-icon{
+        width:24px;
+        height:24px;
     }
     .portfolio-section-icon-activated{
         width:32px;
@@ -446,5 +446,9 @@
     .portfolio-section-clicked{
         width:80px;
         height:66px;
+    }
+    .portfolio-overview-activated{
+        width:64px;
+        height:62px;
     }
 }

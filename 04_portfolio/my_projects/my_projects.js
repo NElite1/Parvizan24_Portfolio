@@ -17,10 +17,11 @@ const ARROW_ICON = `
 
 // Shared in-flight fetch: the stage can be built several times in a row (it is
 // drawn every time its slide is created, even when the user only scrolls past
-// it), and all of those should wait on one request.
+// it), and all of those should wait on one request. The Portfolio overview
+// counts from this same request too, hence the export.
 let projectsPromise = null;
 
-function loadProjects() {
+export function loadProjects() {
     if (!projectsPromise) {
         // no-cache for the same reason as the works files: this is edited by
         // hand, and a stale copy would keep showing the old project.
