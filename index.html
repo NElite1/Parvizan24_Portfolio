@@ -131,7 +131,6 @@
     </div>
   </div>
   <div id="portfolio">
-    <div id="portfolio-particles"></div>
     <!-- Filled by portfolio.js: the overview dashboard first, then the
          section a click on it opens. -->
     <div id="portfolio-content"></div>
@@ -176,37 +175,6 @@
         opacity: { value: { min: 0.10, max: 0.8 } },
         shape: { type: "circle" },
         size: { value: { min: 0.3, max: 1.05 } },
-      },
-    });
-
-    // Portfolio: the same quiet drift, showing in the space around the
-    // overview's panels and the opened sections.
-    tsParticles.load("portfolio-particles", {
-      background: { color: { value: "transparent" } },
-      fullScreen: { enable: false, zIndex: 0 },
-      detectRetina: true,
-      fpsLimit: 60,
-      interactivity: {
-        events: {
-          onHover: { enable: false },
-          onClick: { enable: false },
-          resize: true,
-        },
-      },
-      particles: {
-        color: { value: "#ffffff" },
-        links: { enable: false },
-        move: {
-          direction: "none",
-          enable: true,
-          outModes: { default: "out" },
-          speed: 0.35,
-          random: true,
-        },
-        number: { density: { enable: true, width: 600, height: 600 }, value: 160 },
-        opacity: { value: { min: 0.10, max: 0.7 } },
-        shape: { type: "circle" },
-        size: { value: { min: 0.3, max: 0.9 } },
       },
     });
 

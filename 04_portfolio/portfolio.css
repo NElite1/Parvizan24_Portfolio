@@ -47,17 +47,6 @@
     filter: blur(8px);
 }
 
-/* Drifting dots behind the portfolio, like the hero's and the contacts':
-   they fill the dark around the panels, which stay opaque above them. */
-#portfolio-particles{
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-#portfolio-particles canvas{
-  pointer-events:none !important;
-}
 #portfolio-content{
   display:flex;
   flex-direction:row;
