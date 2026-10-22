@@ -3,7 +3,7 @@ import { loadProjects } from "../my_projects/my_projects.js";
 import { loadSkills } from "../skills/skills.js";
 
 // The Portfolio's first layer. A header bar names the section and sums it up
-// in one sentence of counts; the newest works follow as a carousel of their
+// in count tiles; the newest works follow as a carousel of their
 // real pictures, with works by type, skills, works per month beside a table
 // of totals, and a held place for social media stats still to come.
 // Nothing is typed in by hand; every figure comes from the same Data/ files
@@ -342,35 +342,23 @@ function countUp(el, target) {
     requestAnimationFrame(step);
 }
 
-// "6 works, 1 project and 4 skills, built in 6 months." Each count is a way
-// into its section; the months are the line's job. On phones the same
-// elements become three count tiles with "Built in 6 months" under them:
-// the words joining the sentence (.dash-joiner) are hidden there.
+// Three count tiles - number over word - each a way into its section, then
+// "Built in 6 months": beside them on wide screens, under them on phones.
 function fillHeadline(headline, stats, open, reveal) {
     const counts = [];
-    const phrase = (count, one, section, sectionName) => {
+    const tile = (count, one, section, sectionName) => {
         const link = button("dash-count", () => open(section));
         const number = make("span", "dash-count-number", String(count));
-        link.append(number, make("span", "dash-count-label", ` ${plural(count, one)}`));
+        link.append(number, make("span", "dash-count-label", plural(count, one)));
         link.setAttribute("aria-label", `${count} ${plural(count, one)}. Open ${sectionName}`);
         counts.push([number, count]);
         return link;
     };
-    const joiner = text => make("span", "dash-joiner", text);
-
-    // A count and the punctuation after it never part across lines, so a
-    // narrow screen can't start a line with ", built in".
-    const glue = (...parts) => {
-        const span = make("span", "dash-glue");
-        span.append(...parts);
-        return span;
-    };
-    const last = glue(phrase(stats.skills, "skill", "skills", "Skills"));
 
     headline.replaceChildren(
-        glue(phrase(stats.works, "work", "myWorks", "My Works"), joiner(",")), joiner(" "),
-        phrase(stats.projects, "project", "projects", "Projects"), joiner(" and "),
-        last,
+        tile(stats.works, "work", "myWorks", "My Works"),
+        tile(stats.projects, "project", "projects", "Projects"),
+        tile(stats.skills, "skill", "skills", "Skills"),
     );
 
     if (stats.monthly) {
@@ -379,12 +367,9 @@ function fillHeadline(headline, stats, open, reveal) {
         const span = make("span", "dash-months");
         span.append(number, ` ${plural(months, "month")}`);
         counts.push([number, months]);
-        last.append(joiner(","));
-        const built = make("span", "dash-built", " built in ");
-        built.append(glue(span, joiner(".")));
+        const built = make("span", "dash-built", "Built in ");
+        built.appendChild(span);
         headline.append(built);
-    } else {
-        last.append(joiner("."));
     }
 
     reveal(() => counts.forEach(([el, value]) => countUp(el, value)));
@@ -913,9 +898,9 @@ export function buildDashboard(open) {
     }, { threshold: 0.15 });
     observer.observe(root);
 
-    // One bar: the section's name and the sentence that sums it up.
+    // One bar: the section's name and the counts that sum it up.
     const header = make("header", "dash-header");
-    const headline = make("p", "dash-headline");
+    const headline = make("div", "dash-headline");
     header.append(make("h2", "dash-header-title", "Portfolio"), headline);
 
     const carousel = buildBlock("section", "dash-carousel", "Latest works");

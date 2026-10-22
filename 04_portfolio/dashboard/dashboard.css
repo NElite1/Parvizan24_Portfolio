@@ -1,6 +1,6 @@
 /* Portfolio overview: the first layer of #portfolio, before any section is
    opened. Built by dashboard.js. A header bar carries the section's name and
-   the counts as one sentence; the newest works follow as a carousel of their
+   the counts as tiles; the newest works follow as a carousel of their
    real pictures; types, skills, works per month and a held place for social
    stats sit around them. Everything clickable opens what it
    shows, and every view keeps its size however much is added. */
@@ -85,16 +85,13 @@
     border-radius:3px;
 }
 
-/* Header bar: the section's name and the counts, one line, one border ---- */
+/* Header bar: the section's name, the counts as tiles, one border -------- */
 .dash-header{
-    /* One size for the whole line: the name and the sentence match. */
-    --header-size:clamp(1.15rem, .7rem + .9vw, 1.6rem);
-
     grid-column:1 / -1;
     display:flex;
     align-items:center;
     gap:24px;
-    padding:11px 24px;
+    padding:12px 24px 12px 26px;
 
     background:var(--dash-card);
     border-radius:22px;
@@ -106,50 +103,76 @@
 }
 .dash-header-title{
     flex-shrink:0;
+    align-self:stretch;
+    display:flex;
+    align-items:center;
+    margin:0;
     padding-right:24px;
     border-right:1px solid var(--dash-hairline);
-    font-size:var(--header-size);
+    font-size:clamp(1.3rem, .9rem + .7vw, 1.6rem);
     font-weight:650;
     line-height:1.15;
     letter-spacing:-.035em;
 }
 .dash-headline{
+    flex:1;
     min-width:0;
-    margin:0;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px 10px;
 
     color:var(--dash-muted);
-    font-size:var(--header-size);
     font-weight:500;
-    line-height:1.15;
-    letter-spacing:-.035em;
-    text-wrap:balance;
+    letter-spacing:-.01em;
 }
+/* A count, number over word: a way into its section. */
 .dash-count{
-    display:inline;
-    padding:0;
-    border:0;
-    background:none;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:2px;
+    min-width:118px;
+    padding:9px 14px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    background:var(--dash-raised);
 
     color:var(--dash-ink);
     font-weight:650;
-    text-decoration:underline;
-    text-decoration-thickness:2px;
-    text-underline-offset:.16em;
-    text-decoration-color:rgba(0,168,92,.55);
-    transition:text-decoration-color .2s ease;
+    text-align:left;
+    transition:border-color .2s ease;
 }
-.dash-count:hover{
-    text-decoration-color:var(--dash-green);
-}
-.dash-months{
-    color:var(--dash-accent);
-    font-weight:650;
+.dash-count:hover,
+.dash-count:active{
+    border-color:rgba(0,168,92,.6);
 }
 .dash-count-number{
     font-variant-numeric:tabular-nums;
 }
-.dash-glue{
+.dash-count .dash-count-number{
+    font-size:1.5rem;
+    line-height:1.1;
+    letter-spacing:-.03em;
+}
+.dash-count-label{
+    overflow:hidden;
+    max-width:100%;
+    color:var(--dash-ink-2);
+    font-size:.8rem;
+    font-weight:500;
     white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.dash-built{
+    margin-left:auto;
+    padding-left:8px;
+    font-size:1.05rem;
+    white-space:nowrap;
+}
+.dash-months{
+    color:var(--dash-accent);
+    font-weight:650;
 }
 
 /* Block headers (shared) -------------------------------------------------- */
@@ -1110,9 +1133,9 @@
         gap:14px;
         padding:52px 0 64px;
     }
-    /* The bar stacks: name on top, the sentence under it. */
+    /* The bar stacks: name on top, the tiles under it, filling the row,
+       and "Built in 6 months" under those. */
     .dash-header{
-        --header-size:1.4rem;
         flex-direction:column;
         align-items:flex-start;
         gap:10px;
@@ -1122,61 +1145,24 @@
         padding:0 0 10px;
         border-right:0;
         border-bottom:1px solid var(--dash-hairline);
-        align-self:stretch;
+        font-size:1.4rem;
     }
-    /* The sentence wraps raggedly this narrow, so its counts become three
-       tiles - number over word - with "Built in 6 months" under them. */
     .dash-headline{
         align-self:stretch;
         display:grid;
         grid-template-columns:repeat(3, minmax(0, 1fr));
         gap:8px;
-        letter-spacing:-.01em;
-    }
-    .dash-glue{
-        display:contents;
-    }
-    .dash-joiner{
-        display:none;
     }
     .dash-count{
-        display:flex;
-        flex-direction:column;
-        align-items:flex-start;
-        gap:2px;
         min-width:0;
         padding:10px 12px;
-        border:1px solid rgba(255,255,255,.08);
-        border-radius:14px;
-        background:var(--dash-raised);
-        text-decoration:none;
-        text-align:left;
-        transition:border-color .2s ease;
-    }
-    .dash-count:hover,
-    .dash-count:active{
-        border-color:rgba(0,168,92,.6);
-    }
-    .dash-count .dash-count-number{
-        font-size:1.5rem;
-        line-height:1.1;
-        letter-spacing:-.03em;
-    }
-    .dash-count-label{
-        overflow:hidden;
-        max-width:100%;
-        color:var(--dash-ink-2);
-        font-size:.8rem;
-        font-weight:500;
-        white-space:nowrap;
-        text-overflow:ellipsis;
     }
     .dash-built{
         grid-column:1 / -1;
+        margin:0;
+        padding:0;
         font-size:.92rem;
-    }
-    .dash-built::first-letter{
-        text-transform:uppercase;
+        white-space:normal;
     }
     .dash-carousel{
         padding:12px 12px 14px;
