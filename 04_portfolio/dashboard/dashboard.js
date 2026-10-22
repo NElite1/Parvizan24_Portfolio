@@ -343,22 +343,34 @@ function countUp(el, target) {
 }
 
 // "6 works, 1 project and 4 skills, built in 6 months." Each count is a way
-// into its section; the months are the line's job.
+// into its section; the months are the line's job. On phones the same
+// elements become three count tiles with "Built in 6 months" under them:
+// the words joining the sentence (.dash-joiner) are hidden there.
 function fillHeadline(headline, stats, open, reveal) {
     const counts = [];
     const phrase = (count, one, section, sectionName) => {
         const link = button("dash-count", () => open(section));
         const number = make("span", "dash-count-number", String(count));
-        link.append(number, ` ${plural(count, one)}`);
+        link.append(number, make("span", "dash-count-label", ` ${plural(count, one)}`));
         link.setAttribute("aria-label", `${count} ${plural(count, one)}. Open ${sectionName}`);
         counts.push([number, count]);
         return link;
     };
+    const joiner = text => make("span", "dash-joiner", text);
+
+    // A count and the punctuation after it never part across lines, so a
+    // narrow screen can't start a line with ", built in".
+    const glue = (...parts) => {
+        const span = make("span", "dash-glue");
+        span.append(...parts);
+        return span;
+    };
+    const last = glue(phrase(stats.skills, "skill", "skills", "Skills"));
 
     headline.replaceChildren(
-        phrase(stats.works, "work", "myWorks", "My Works"), ", ",
-        phrase(stats.projects, "project", "projects", "Projects"), " and ",
-        phrase(stats.skills, "skill", "skills", "Skills"),
+        glue(phrase(stats.works, "work", "myWorks", "My Works"), joiner(",")), joiner(" "),
+        phrase(stats.projects, "project", "projects", "Projects"), joiner(" and "),
+        last,
     );
 
     if (stats.monthly) {
@@ -367,9 +379,13 @@ function fillHeadline(headline, stats, open, reveal) {
         const span = make("span", "dash-months");
         span.append(number, ` ${plural(months, "month")}`);
         counts.push([number, months]);
-        headline.append(", built in ", span);
+        last.append(joiner(","));
+        const built = make("span", "dash-built", " built in ");
+        built.append(glue(span, joiner(".")));
+        headline.append(built);
+    } else {
+        last.append(joiner("."));
     }
-    headline.append(".");
 
     reveal(() => counts.forEach(([el, value]) => countUp(el, value)));
 }

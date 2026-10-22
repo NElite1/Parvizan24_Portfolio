@@ -8,6 +8,10 @@
   justify-content:space-evenly;
   align-items:center;
   padding-top:75px;
+  /* The portrait's spotlight (#hero-photo::before) is wider than the photo;
+     on phones the photo spans the screen, so trim the spotlight at the
+     section's sides instead of letting the page scroll sideways. */
+  overflow-x:clip;
 }
 
 #hero::before {

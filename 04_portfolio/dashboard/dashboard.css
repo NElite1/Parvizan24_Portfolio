@@ -148,6 +148,9 @@
 .dash-count-number{
     font-variant-numeric:tabular-nums;
 }
+.dash-glue{
+    white-space:nowrap;
+}
 
 /* Block headers (shared) -------------------------------------------------- */
 .dash-block-head{
@@ -567,9 +570,12 @@
 .dash-legend-label{
     flex:1;
     min-width:0;
+    overflow:hidden;
     color:var(--dash-ink-2);
     font-size:.88rem;
     text-align:left;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 .dash-legend-value{
     font-size:.95rem;
@@ -1118,6 +1124,60 @@
         border-bottom:1px solid var(--dash-hairline);
         align-self:stretch;
     }
+    /* The sentence wraps raggedly this narrow, so its counts become three
+       tiles - number over word - with "Built in 6 months" under them. */
+    .dash-headline{
+        align-self:stretch;
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:8px;
+        letter-spacing:-.01em;
+    }
+    .dash-glue{
+        display:contents;
+    }
+    .dash-joiner{
+        display:none;
+    }
+    .dash-count{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-start;
+        gap:2px;
+        min-width:0;
+        padding:10px 12px;
+        border:1px solid rgba(255,255,255,.08);
+        border-radius:14px;
+        background:var(--dash-raised);
+        text-decoration:none;
+        text-align:left;
+        transition:border-color .2s ease;
+    }
+    .dash-count:hover,
+    .dash-count:active{
+        border-color:rgba(0,168,92,.6);
+    }
+    .dash-count .dash-count-number{
+        font-size:1.5rem;
+        line-height:1.1;
+        letter-spacing:-.03em;
+    }
+    .dash-count-label{
+        overflow:hidden;
+        max-width:100%;
+        color:var(--dash-ink-2);
+        font-size:.8rem;
+        font-weight:500;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+    }
+    .dash-built{
+        grid-column:1 / -1;
+        font-size:.92rem;
+    }
+    .dash-built::first-letter{
+        text-transform:uppercase;
+    }
     .dash-carousel{
         padding:12px 12px 14px;
     }
@@ -1146,8 +1206,27 @@
     .dash-types{
         padding-right:0;
     }
+    /* Stacked, each block is as tall as its content: sharing the panel's
+       height let the longer skills list run out under the panel's edge. */
+    .dash-block{
+        flex:none;
+    }
+    /* A smaller ring and tighter rows leave the legend room for its longest
+       label ("Programming") beside the count. */
+    .dash-types .dash-block-body{
+        gap:14px;
+    }
     .dash-donut{
-        width:118px;
+        width:100px;
+    }
+    .dash-legend-item{
+        gap:8px;
+        padding:7px 8px;
+    }
+    /* One area under the other: two columns cut the skill names short. */
+    .dash-skill-groups{
+        grid-template-columns:minmax(0, 1fr);
+        gap:14px;
     }
     .dash-pace{
         padding:14px 16px 12px;
@@ -1176,6 +1255,22 @@
     }
     .dash-action{
         justify-content:center;
+    }
+}
+
+/* Small phone: the ring shrinks again so "Programming" still fits whole. */
+@media (max-width:400px){
+    .dash-panel{
+        padding:4px 16px;
+    }
+    .dash-donut{
+        width:88px;
+    }
+    .dash-donut-total{
+        font-size:1.6rem;
+    }
+    .dash-legend-item{
+        padding:7px 6px;
     }
 }
 
